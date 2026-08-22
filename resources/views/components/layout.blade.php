@@ -35,8 +35,8 @@
 
 				<!-- Auth Buttons -->
 				<div class="flex items-center gap-3">
-					<a class="rounded-xl px-4 py-2 text-sm font-semibold text-[#4b4b4b] transition hover:bg-[#faf8f5] hover:text-[#1b1b18]" href="#">Sign In</a>
-					<a class="rounded-xl bg-[#1b1b18] px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-800 shadow-sm" href="#">Sign Up</a>
+					<a class="rounded-xl px-4 py-2 text-sm font-semibold text-[#4b4b4b] transition hover:bg-[#faf8f5] hover:text-[#1b1b18]" href="{{ url('/login') }}">Sign In</a>
+					<a class="rounded-xl bg-[#1b1b18] px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-800 shadow-sm" href="{{ url('/register') }}">Sign Up</a>
 				</div>
 			</div>
 		</div>
