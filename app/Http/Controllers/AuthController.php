@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\PasswordResetCode;
+use Illuminate\Support\Facades\Mail;
 
 
 
@@ -75,7 +76,7 @@ class AuthController extends Controller
     
     }
  
-    // 4. Send 5-digit code to browser as alert
+    // 4. Send 5-digit code via Mailtrap
 public function sendResetCode(Request $request)
 {
     $request->validate([
@@ -91,10 +92,16 @@ public function sendResetCode(Request $request)
             'expires_at' => now()->addMinutes(15) // Expires in 15 mins
         ]
     );
-    // Redirect back to the form, prefilling the email, and flashing the code in the session
+    
+    // Send email using Mailtrap SMTP credentials configured in .env
+    Mail::raw("Your EasyBuy password reset code is: {$code}", function ($message) use ($request) {
+        $message->to($request->email)
+                ->subject('Password Reset Code');
+    });
+
+    // Redirect back to the form, prefilling the email, and flashing a success banner
     return redirect('/forgot-password?email=' . $request->email)
-        ->with('alert_code', $code)
-        ->with('success', 'Code generated! Look at your browser alert.');
+        ->with('success', 'A 5-digit verification code has been sent to your email.');
 }
 // 5. Reset Password using the code
 public function resetPassword(Request $request)

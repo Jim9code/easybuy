@@ -14,7 +14,6 @@
 				</p>
 			</div>
 
-			<!-- Display Validation Errors -->
 			@if ($errors->any())
 				<div class="rounded-2xl bg-red-50 p-4 border border-red-100 text-xs text-red-600 font-semibold">
 					<ul class="list-disc pl-4 space-y-1">
@@ -22,6 +21,13 @@
 							<li>{{ $error }}</li>
 						@endforeach
 					</ul>
+				</div>
+			@endif
+
+			<!-- Display Success Messages -->
+			@if (session('success'))
+				<div class="mb-4 rounded-2xl bg-emerald-50 p-4 border border-emerald-100 text-xs text-emerald-700 font-semibold">
+					{{ session('success') }}
 				</div>
 			@endif
 
@@ -120,14 +126,6 @@
 			@endif
 		</div>
 	</div>
-
-	<!-- JavaScript Alert for Local Dev Code -->
-	@if (session('alert_code'))
-		<script>
-			alert("🔑 [LOCAL DEV RESET CODE]\n\nYour 5-digit verification code is: {{ session('alert_code') }}\n\nEnter this code in the input boxes below to complete Step 2.");
-		</script>
-	@endif
-
 	<!-- JavaScript for Focus Shifting and Code Concatenation -->
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
