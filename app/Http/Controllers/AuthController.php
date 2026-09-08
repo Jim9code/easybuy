@@ -34,6 +34,12 @@ class AuthController extends Controller
 
         //login the user
         Auth::login($user);
+
+        $pendingPrompt = $request->input('pending_prompt') ?: $request->query('prompt');
+        if ($pendingPrompt) {
+            return redirect('/home?username=' . urlencode($user->username) . '&prompt=' . urlencode($pendingPrompt));
+        }
+
         // Redirect to the dashboard home with their username in the query parameters (matching our current dashboard request('username') logic)
         return redirect('/home?username=' . $user->username);
     }
@@ -51,8 +57,24 @@ class AuthController extends Controller
 
         //attempts to authenticate the user and check if credentials are correct
         if (Auth::attempt($credentials, $request->boolean('remember_me'))) {
-            $request->session()->regenerate();
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
             $user = Auth::user();
+
+            if ($user->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            if ($user->isSupplier()) {
+                return redirect()->route('supplier.dashboard');
+            }
+
+            $pendingPrompt = $request->input('pending_prompt') ?: $request->query('prompt');
+            if ($pendingPrompt) {
+                return redirect('/home?username=' . urlencode($user->username) . '&prompt=' . urlencode($pendingPrompt));
+            }
+
             return redirect('/home?username=' . $user->username);
         }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EasybuyController extends Controller
 {
@@ -11,6 +12,10 @@ class EasybuyController extends Controller
      */
     public function index()
     {
+        if (Auth::check() && Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         return view('welcome');
     }
 
