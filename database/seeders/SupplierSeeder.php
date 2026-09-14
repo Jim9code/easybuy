@@ -137,5 +137,17 @@ class SupplierSeeder extends Seeder
                 'tracking_number' => 'FX-98214-US'
             ]
         );
+
+        // 5. Create or update Admin User
+        User::updateOrCreate(
+            ['email' => 'codecraft4th@gmail.com'],
+            [
+                'username' => 'CodecraftAdmin',
+                'password' => Hash::make('password123'),
+                'role' => 'admin',
+                'company_name' => 'EasyBuy HQ Admin Operations',
+                'phone' => '+1 (800) 555-0199',
+            ]
+        );
     }
 }

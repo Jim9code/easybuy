@@ -104,12 +104,19 @@ class UserRoleSetupSeeder extends Seeder
         ]);
 
         // 6. Purge all dummy orders, order items, payments, and cart items
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('order_items')->truncate();
-        DB::table('orders')->truncate();
-        DB::table('payments')->truncate();
-        CartItem::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            DB::table('order_items')->truncate();
+            DB::table('orders')->truncate();
+            DB::table('payments')->truncate();
+            CartItem::truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } else {
+            \App\Models\OrderItem::query()->delete();
+            \App\Models\Order::query()->delete();
+            \App\Models\Payment::query()->delete();
+            CartItem::query()->delete();
+        }
 
         echo "UserRoleSetupSeeder completed (Clean Zero-Dummy State):\n";
         echo "- Admin: {$admin->email} (ID: {$admin->id}, Role: {$admin->role})\n";

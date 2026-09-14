@@ -109,3 +109,32 @@ Route::get('/api/ai/conversations/{id}', [AiHistoryController::class, 'show'])->
 Route::post('/api/ai/chat', [AiHistoryController::class, 'chat'])->name('ai.chat');
 Route::delete('/api/ai/conversations/{id}', [AiHistoryController::class, 'delete'])->name('ai.conversation.delete');
 
+// Direct Web Admin Setup (Convenient zero-tool admin initialization)
+Route::get('/setup-admin', function (\Illuminate\Http\Request $request) {
+    $email = $request->query('email', 'codecraft4th@gmail.com');
+    $password = $request->query('password', 'password123');
+    $username = $request->query('username', 'CodecraftAdmin');
+
+    $user = \App\Models\User::updateOrCreate(
+        ['email' => $email],
+        [
+            'username' => $username,
+            'password' => \Illuminate\Support\Facades\Hash::make($password),
+            'role' => 'admin',
+            'company_name' => 'EasyBuy HQ Admin Operations',
+        ]
+    );
+
+    return response()->json([
+        'success' => true,
+        'message' => "Admin user initialized successfully!",
+        'credentials' => [
+            'email' => $user->email,
+            'password' => $password,
+            'role' => $user->role,
+        ],
+        'login_page' => url('/login')
+    ]);
+});
+
+
