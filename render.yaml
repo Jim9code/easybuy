@@ -13,6 +13,8 @@ services:
         value: production
       - key: APP_DEBUG
         value: "false"
+      - key: APP_KEY
+        value: base64:2VVHoZAy/C60UkdUBm3piMbiAF0Y/xCxsKAANOhAwNI=
       - key: LOG_CHANNEL
         value: stderr
       - key: SESSION_DRIVER
