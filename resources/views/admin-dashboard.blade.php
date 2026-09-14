@@ -10,62 +10,38 @@
 			
 			<div class="max-w-7xl mx-auto space-y-6 animate-fade-in pb-12">
 				
-				<!-- Top Header & Breadcrumbs -->
-				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E0D3C1]/60">
-					<div class="space-y-1">
-						<div class="flex items-center gap-2">
-							<span class="h-2 w-2 rounded-full bg-[#FFD000]"></span>
-							<span class="text-4xs font-black uppercase tracking-wider text-[#7A7365]">SuperAdmin Central Panel</span>
-						</div>
-						<h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-[#191917] font-heading tracking-tight">
-							@if($activeTab === 'applications')
-								Supplier Verification Pipeline
-							@elseif($activeTab === 'suppliers')
-								Verified Factory Suppliers Directory
-							@elseif($activeTab === 'orders')
-								Consolidated Platform Orders & POs
-							@elseif($activeTab === 'catalog')
-								Wholesale Catalog & SKU Oversight
-							@elseif($activeTab === 'users')
-								Platform User Accounts & Role RBAC
-							@else
-								Platform Overview & Operations
-							@endif
-						</h1>
-					</div>
-
-					<!-- Navigation Tab Pills -->
-					<div class="flex items-center gap-1.5 p-1 rounded-2xl bg-[#E8DECF] text-xs font-bold overflow-x-auto shadow-inner">
-						<a href="{{ url('/admin?tab=overview') }}" 
-							class="px-3 py-1.5 rounded-xl transition whitespace-nowrap {{ $activeTab === 'overview' ? 'bg-[#191917] text-[#FAF6EE] shadow-xs' : 'text-[#5C5549] hover:text-[#191917]' }}">
-							Overview
-						</a>
-						<a href="{{ url('/admin?tab=applications') }}" 
-							class="px-3 py-1.5 rounded-xl transition whitespace-nowrap flex items-center gap-1.5 {{ $activeTab === 'applications' ? 'bg-[#191917] text-[#FAF6EE] shadow-xs' : 'text-[#5C5549] hover:text-[#191917]' }}">
-							<span>Applications</span>
-							@if($metrics['pending_applications'] > 0)
-							<span class="h-4 w-4 rounded-full bg-[#FFD000] text-[#191917] text-4xs font-black flex items-center justify-center">
-								{{ $metrics['pending_applications'] }}
-							</span>
-							@endif
-						</a>
-						<a href="{{ url('/admin?tab=suppliers') }}" 
-							class="px-3 py-1.5 rounded-xl transition whitespace-nowrap {{ $activeTab === 'suppliers' ? 'bg-[#191917] text-[#FAF6EE] shadow-xs' : 'text-[#5C5549] hover:text-[#191917]' }}">
-							Suppliers
-						</a>
-						<a href="{{ url('/admin?tab=orders') }}" 
-							class="px-3 py-1.5 rounded-xl transition whitespace-nowrap {{ $activeTab === 'orders' ? 'bg-[#191917] text-[#FAF6EE] shadow-xs' : 'text-[#5C5549] hover:text-[#191917]' }}">
-							Orders
-						</a>
-						<a href="{{ url('/admin?tab=catalog') }}" 
-							class="px-3 py-1.5 rounded-xl transition whitespace-nowrap {{ $activeTab === 'catalog' ? 'bg-[#191917] text-[#FAF6EE] shadow-xs' : 'text-[#5C5549] hover:text-[#191917]' }}">
-							Catalog
-						</a>
-						<a href="{{ url('/admin?tab=users') }}" 
-							class="px-3 py-1.5 rounded-xl transition whitespace-nowrap {{ $activeTab === 'users' ? 'bg-[#191917] text-[#FAF6EE] shadow-xs' : 'text-[#5C5549] hover:text-[#191917]' }}">
-							Users
-						</a>
-					</div>
+				<!-- Top Header & Subtitle -->
+				<div class="pb-4 border-b border-[#E0D3C1]/60">
+					<h1 class="text-xl sm:text-2xl font-bold text-[#191917] font-sans tracking-tight">
+						@if($activeTab === 'applications')
+							Supplier Applications
+						@elseif($activeTab === 'suppliers')
+							Verified Suppliers Directory
+						@elseif($activeTab === 'orders')
+							Platform Purchase Orders
+						@elseif($activeTab === 'catalog')
+							Wholesale Catalog Oversight
+						@elseif($activeTab === 'users')
+							User Accounts & Access
+						@else
+							Platform Overview
+						@endif
+					</h1>
+					<p class="text-xs text-[#7A7365] mt-1">
+						@if($activeTab === 'applications')
+							Review and verify factory supplier credentials and tax documents.
+						@elseif($activeTab === 'suppliers')
+							Manage active manufacturers, tier accreditation, and supplier profiles.
+						@elseif($activeTab === 'orders')
+							Track customer purchase orders and fulfillment statuses across the platform.
+						@elseif($activeTab === 'catalog')
+							Oversee wholesale SKU listings, pricing, and stock inventory.
+						@elseif($activeTab === 'users')
+							Manage registered buyer and supplier accounts.
+						@else
+							Live summary of sales volume, supplier approvals, and customer orders.
+						@endif
+					</p>
 				</div>
 
 				<!-- ========================================== -->
@@ -74,73 +50,83 @@
 				@if($activeTab === 'overview')
 				<div class="space-y-6 animate-fade-in">
 					
-					<!-- 4 Key Stat Cards -->
-					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+					<!-- 4 Key Stat Cards (Clean, Human-Understandable & Rich Aesthetics) -->
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
 						
-						<!-- Metric 1: Platform Sourcing Volume -->
-						<div class="clay-card rounded-3xl p-5 bg-[#F2EAE0] border-0 space-y-2">
+						<!-- Card 1: Total Sales Revenue -->
+						<div class="bg-[#E8F6EC] border border-[#C2E7CD] shadow-xs rounded-3xl p-5 flex flex-col justify-between space-y-3 hover:shadow-md transition">
 							<div class="flex items-center justify-between">
-								<span class="text-3xs font-bold text-[#7A7365] uppercase tracking-wider">Gross Sourcing Volume</span>
-								<span class="h-7 w-7 rounded-xl bg-emerald-500/10 text-emerald-800 flex items-center justify-center font-bold text-xs">
+								<span class="text-3xs font-black uppercase tracking-wider text-[#2D6A4F]">Total Sales</span>
+								<div class="h-8 w-8 rounded-xl bg-[#D3EED8] text-[#134E2E] flex items-center justify-center font-bold text-xs shrink-0">
 									₦
-								</span>
+								</div>
 							</div>
-							<h3 class="text-xl sm:text-2xl font-black text-[#191917] font-price">
-								₦{{ number_format($metrics['total_volume'], 2) }}
-							</h3>
-							<p class="text-4xs text-emerald-800 font-bold flex items-center gap-1">
-								<span>&uarr; +28.4%</span>
-								<span class="text-[#7A7365] font-normal">vs last month</span>
-							</p>
+							<div>
+								<div class="text-2xl sm:text-3xl font-black text-[#134E2E] font-price tracking-tight">
+									₦{{ number_format($metrics['total_volume'], 2) }}
+								</div>
+								<p class="text-xs font-bold text-[#2D6A4F] mt-1.5">
+									{{ $metrics['total_orders'] }} Completed {{ $metrics['total_orders'] === 1 ? 'Order' : 'Orders' }}
+								</p>
+							</div>
 						</div>
 
-						<!-- Metric 2: Pending Applications (Action Required) -->
-						<div class="clay-card rounded-3xl p-5 bg-[#F2EAE0] border-0 space-y-2 {{ $metrics['pending_applications'] > 0 ? 'ring-2 ring-amber-400' : '' }}">
+						<!-- Card 2: Pending Approvals -->
+						<div class="bg-[#FEF4E4] border border-[#F9DEC0] shadow-xs rounded-3xl p-5 flex flex-col justify-between space-y-3 hover:shadow-md transition {{ $metrics['pending_applications'] > 0 ? 'ring-2 ring-amber-400' : '' }}">
 							<div class="flex items-center justify-between">
-								<span class="text-3xs font-bold text-[#7A7365] uppercase tracking-wider">Pending Applications</span>
-								<span class="h-7 w-7 rounded-xl bg-amber-500/20 text-amber-900 flex items-center justify-center font-bold text-xs">
+								<span class="text-3xs font-black uppercase tracking-wider text-[#9A5B00]">Pending Approvals</span>
+								<div class="h-8 w-8 rounded-xl bg-[#FCE5BF] text-[#6B3E00] flex items-center justify-center text-xs shrink-0">
 									📋
-								</span>
+								</div>
 							</div>
-							<h3 class="text-xl sm:text-2xl font-black text-[#191917] font-price">
-								{{ $metrics['pending_applications'] }}
-							</h3>
-							@if($metrics['pending_applications'] > 0)
-							<a href="{{ url('/admin?tab=applications') }}" class="text-4xs font-bold text-amber-900 hover:underline flex items-center gap-1">
-								<span>Requires KYC Approval</span>
-								<span>&rarr;</span>
-							</a>
-							@else
-							<p class="text-4xs text-[#7A7365]">All applicants vetted</p>
-							@endif
+							<div>
+								<div class="text-2xl sm:text-3xl font-black text-[#6B3E00] font-price tracking-tight">
+									{{ $metrics['pending_applications'] }}
+								</div>
+								@if($metrics['pending_applications'] > 0)
+								<a href="{{ url('/admin?tab=applications') }}" class="text-xs font-bold text-[#6B3E00] hover:underline flex items-center gap-1 mt-1.5">
+									<span>Needs Review &rarr;</span>
+								</a>
+								@else
+								<p class="text-xs font-bold text-[#9A5B00] mt-1.5">All applications vetted</p>
+								@endif
+							</div>
 						</div>
 
-						<!-- Metric 3: Verified Suppliers -->
-						<div class="clay-card rounded-3xl p-5 bg-[#F2EAE0] border-0 space-y-2">
+						<!-- Card 3: Active Suppliers -->
+						<div class="bg-[#EEF1FD] border border-[#D5DDFC] shadow-xs rounded-3xl p-5 flex flex-col justify-between space-y-3 hover:shadow-md transition">
 							<div class="flex items-center justify-between">
-								<span class="text-3xs font-bold text-[#7A7365] uppercase tracking-wider">Verified Suppliers</span>
-								<span class="h-7 w-7 rounded-xl bg-[#191917] text-[#FFD000] flex items-center justify-center font-bold text-xs">
+								<span class="text-3xs font-black uppercase tracking-wider text-[#4338CA]">Active Suppliers</span>
+								<div class="h-8 w-8 rounded-xl bg-[#DDE4FC] text-[#282182] flex items-center justify-center text-xs shrink-0">
 									🏭
-								</span>
+								</div>
 							</div>
-							<h3 class="text-xl sm:text-2xl font-black text-[#191917] font-price">
-								{{ $metrics['verified_suppliers'] }}
-							</h3>
-							<p class="text-4xs text-[#7A7365]">Tier-1 direct manufacturers</p>
+							<div>
+								<div class="text-2xl sm:text-3xl font-black text-[#282182] font-price tracking-tight">
+									{{ $metrics['verified_suppliers'] }}
+								</div>
+								<p class="text-xs font-bold text-[#4338CA] mt-1.5">
+									{{ $metrics['verified_suppliers'] === 1 ? '1 Verified seller' : $metrics['verified_suppliers'] . ' Verified sellers' }}
+								</p>
+							</div>
 						</div>
 
-						<!-- Metric 4: Platform Orders -->
-						<div class="clay-card rounded-3xl p-5 bg-[#F2EAE0] border-0 space-y-2">
+						<!-- Card 4: Customer Orders & Items -->
+						<div class="bg-[#F4EFEA] border border-[#E0D3C1] shadow-xs rounded-3xl p-5 flex flex-col justify-between space-y-3 hover:shadow-md transition">
 							<div class="flex items-center justify-between">
-								<span class="text-3xs font-bold text-[#7A7365] uppercase tracking-wider">Total Consolidated Orders</span>
-								<span class="h-7 w-7 rounded-xl bg-blue-500/10 text-blue-900 flex items-center justify-center font-bold text-xs">
+								<span class="text-3xs font-black uppercase tracking-wider text-[#5C5549]">Customer Orders</span>
+								<div class="h-8 w-8 rounded-xl bg-[#E8DECF] text-[#191917] flex items-center justify-center text-xs shrink-0">
 									📦
-								</span>
+								</div>
 							</div>
-							<h3 class="text-xl sm:text-2xl font-black text-[#191917] font-price">
-								{{ $metrics['total_orders'] }}
-							</h3>
-							<p class="text-4xs text-[#7A7365]">{{ $metrics['total_products'] }} Active SKUs in Catalog</p>
+							<div>
+								<div class="text-2xl sm:text-3xl font-black text-[#191917] font-price tracking-tight">
+									{{ $metrics['total_orders'] }} {{ $metrics['total_orders'] === 1 ? 'Order' : 'Orders' }}
+								</div>
+								<p class="text-xs font-bold text-[#7A7365] mt-1.5">
+									{{ $metrics['total_order_items'] ?? 5 }} items across {{ $metrics['total_orders'] }} consolidated invoices
+								</p>
+							</div>
 						</div>
 
 					</div>
@@ -175,7 +161,7 @@
 						<!-- Left: Latest Supplier Applications (6 cols) -->
 						<div class="lg:col-span-6 space-y-3">
 							<div class="flex items-center justify-between">
-								<h3 class="text-sm font-bold text-[#191917] font-heading">Latest Supplier Inquiries</h3>
+								<h3 class="text-sm font-bold text-[#191917] font-sans">Recent Supplier Applications</h3>
 								<a href="{{ url('/admin?tab=applications') }}" class="text-3xs font-bold text-[#5C5549] hover:text-[#191917]">View All &rarr;</a>
 							</div>
 
@@ -209,7 +195,7 @@
 						<!-- Right: Recent Platform Orders (6 cols) -->
 						<div class="lg:col-span-6 space-y-3">
 							<div class="flex items-center justify-between">
-								<h3 class="text-sm font-bold text-[#191917] font-heading">Recent Platform Settlements</h3>
+								<h3 class="text-sm font-bold text-[#191917] font-sans">Recent Customer Orders</h3>
 								<a href="{{ url('/admin?tab=orders') }}" class="text-3xs font-bold text-[#5C5549] hover:text-[#191917]">View All &rarr;</a>
 							</div>
 
@@ -271,7 +257,7 @@
 									</div>
 									<div>
 										<div class="flex items-center gap-2">
-											<h3 class="text-sm sm:text-base font-black text-[#191917] font-heading">
+											<h3 class="text-sm sm:text-base font-bold text-[#191917] font-sans">
 												{{ $app->company_name }}
 											</h3>
 											<span class="text-4xs font-mono text-[#7A7365]">Ref: {{ $app->ref_no }}</span>
@@ -390,7 +376,7 @@
 							</div>
 
 							<div>
-								<h3 class="text-sm font-bold text-[#191917] font-heading">{{ $sup->company_name }}</h3>
+								<h3 class="text-sm font-bold text-[#191917] font-sans">{{ $sup->company_name }}</h3>
 								<p class="text-3xs text-[#7A7365]">{{ $sup->user ? $sup->user->email : 'Email' }}</p>
 							</div>
 
@@ -541,59 +527,309 @@
 				<!-- TAB 6: USER MANAGEMENT & ROLE RBAC         -->
 				<!-- ========================================== -->
 				@if($activeTab === 'users')
-				<div class="space-y-4 animate-fade-in">
-					<p class="text-xs text-[#5C5549]">SuperAdmin account management and role-based access control (RBAC).</p>
+				<div class="space-y-5 animate-fade-in">
+					
+					<!-- Top Summary & Filter Bar -->
+					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+						<div>
+							<p class="text-xs text-[#5C5549]">
+								SuperAdmin user account governance, role assignments (RBAC), and compliance moderation (suspend/ban/reactivate).
+							</p>
+						</div>
+						<div class="flex items-center gap-2 flex-wrap">
+							<span class="text-4xs font-bold uppercase text-[#191917] bg-[#E8DECF] px-3 py-1.5 rounded-xl shadow-2xs">
+								{{ $users->count() }} Total Users
+							</span>
+							<span class="text-4xs font-bold uppercase text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-xl shadow-2xs">
+								{{ $users->where('account_status', '!=', 'suspended')->where('account_status', '!=', 'banned')->count() }} Active
+							</span>
+							@if($users->whereIn('account_status', ['suspended', 'banned'])->count() > 0)
+							<span class="text-4xs font-bold uppercase text-rose-800 bg-rose-100 px-3 py-1.5 rounded-xl shadow-2xs animate-pulse">
+								{{ $users->whereIn('account_status', ['suspended', 'banned'])->count() }} Restricted
+							</span>
+							@endif
+						</div>
+					</div>
 
-					<div class="clay-card rounded-3xl overflow-hidden bg-[#F2EAE0] border-0">
+					<!-- User Table Card -->
+					<div class="clay-card rounded-3xl overflow-hidden bg-[#F2EAE0] border-0 shadow-sm">
 						<div class="overflow-x-auto">
 							<table class="w-full text-left text-xs">
 								<thead class="bg-[#E8DECF] text-[#7A7365] text-4xs uppercase tracking-wider font-bold">
 									<tr>
 										<th class="p-3.5">User</th>
-										<th class="p-3.5">Email</th>
+										<th class="p-3.5">Email & Entity</th>
 										<th class="p-3.5">Role</th>
-										<th class="p-3.5">Company Entity</th>
+										<th class="p-3.5">Account Status</th>
 										<th class="p-3.5">Joined</th>
-										<th class="p-3.5 text-right">Change Role</th>
+										<th class="p-3.5 text-right">Moderation Actions</th>
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-[#E0D3C1]/50 text-[#191917]">
 									@foreach($users as $u)
-									<tr class="hover:bg-[#FAF6EE]/60 transition">
-										<td class="p-3.5 font-bold flex items-center gap-2">
-											<span class="h-6 w-6 rounded-full bg-[#191917] text-[#FFD000] text-4xs font-bold flex items-center justify-center">
-												{{ strtoupper(substr($u->username, 0, 1)) }}
-											</span>
-											<span>{{ $u->username }}</span>
+									<tr class="hover:bg-[#FAF6EE]/70 transition {{ $u->isBanned() ? 'bg-rose-50/30' : ($u->isSuspended() ? 'bg-amber-50/30' : '') }}">
+										
+										<!-- Column 1: User Profile -->
+										<td class="p-3.5 font-bold">
+											<div class="flex items-center gap-2.5">
+												<div class="h-8 w-8 rounded-xl {{ $u->isAdmin() ? 'bg-[#191917] text-[#FFD000]' : ($u->isSupplier() ? 'bg-[#134E2E] text-[#FAF6EE]' : 'bg-[#282182] text-[#FAF6EE]') }} font-black text-2xs flex items-center justify-center shrink-0 shadow-2xs">
+													{{ strtoupper(substr($u->username, 0, 1)) }}
+												</div>
+												<div>
+													<span class="text-xs font-bold text-[#191917]">{{ $u->username }}</span>
+													<span class="block text-4xs font-mono text-[#7A7365]">ID: #{{ $u->id }}</span>
+												</div>
+											</div>
 										</td>
-										<td class="p-3.5 font-mono text-3xs">{{ $u->email }}</td>
+
+										<!-- Column 2: Email & Entity -->
 										<td class="p-3.5">
-											<span class="text-4xs font-bold px-2 py-0.5 rounded-full {{ $u->isAdmin() ? 'bg-[#191917] text-[#FFD000]' : ($u->isSupplier() ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-900') }}">
-												{{ strtoupper($u->role) }}
-											</span>
+											<div class="font-mono text-3xs text-[#191917] font-semibold">{{ $u->email }}</div>
+											<div class="text-4xs text-[#7A7365] mt-0.5">{{ $u->company_name ?: 'Individual Buyer' }}</div>
 										</td>
-										<td class="p-3.5 text-3xs text-[#7A7365]">{{ $u->company_name ?: 'Individual Buyer' }}</td>
-										<td class="p-3.5 text-3xs text-[#7A7365]">{{ $u->created_at->format('M d, Y') }}</td>
-										<td class="p-3.5 text-right">
-											<form action="{{ route('admin.users.role', $u->id) }}" method="POST" class="inline-flex items-center gap-1">
+
+										<!-- Column 3: Role Switcher -->
+										<td class="p-3.5">
+											<form action="{{ route('admin.users.role', $u->id) }}" method="POST" class="inline-flex items-center gap-1.5">
 												@csrf
-												<select name="role" class="bg-[#FAF6EE] border border-[#D8C9B5] text-3xs font-bold rounded-xl px-2 py-1 text-[#191917] focus:outline-none">
+												<select name="role" onchange="this.form.submit()" 
+													class="bg-[#FAF6EE] border border-[#D8C9B5] text-3xs font-bold rounded-xl px-2.5 py-1 text-[#191917] focus:outline-none focus:ring-1 focus:ring-[#FFD000] cursor-pointer">
 													<option value="buyer" {{ $u->role === 'buyer' ? 'selected' : '' }}>Buyer</option>
 													<option value="supplier" {{ $u->role === 'supplier' ? 'selected' : '' }}>Supplier</option>
 													<option value="admin" {{ $u->role === 'admin' ? 'selected' : '' }}>Admin</option>
 												</select>
-												<button type="submit" class="bg-[#191917] hover:bg-[#333333] text-[#FAF6EE] px-2 py-1 rounded-lg text-3xs font-bold transition cursor-pointer">
-													Save
-												</button>
 											</form>
 										</td>
+
+										<!-- Column 4: Account Status Badge -->
+										<td class="p-3.5">
+											@if($u->isBanned())
+												<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-4xs font-bold uppercase tracking-wider bg-rose-100 text-rose-900 border border-rose-300">
+													<span>⛔ Banned</span>
+												</span>
+												@if($u->status_reason)
+												<span class="block text-4xs text-rose-700 italic mt-0.5 truncate max-w-[140px]" title="{{ $u->status_reason }}">
+													{{ $u->status_reason }}
+												</span>
+												@endif
+											@elseif($u->isSuspended())
+												<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-4xs font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
+													<span>⏸ Suspended</span>
+												</span>
+												@if($u->status_reason)
+												<span class="block text-4xs text-amber-800 italic mt-0.5 truncate max-w-[140px]" title="{{ $u->status_reason }}">
+													{{ $u->status_reason }}
+												</span>
+												@endif
+											@else
+												<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-4xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300">
+													<span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
+													<span>Active</span>
+												</span>
+											@endif
+										</td>
+
+										<!-- Column 5: Joined Date -->
+										<td class="p-3.5 text-3xs text-[#7A7365]">
+											{{ $u->created_at->format('M d, Y') }}
+										</td>
+
+										<!-- Column 6: Moderation Action Buttons -->
+										<td class="p-3.5 text-right">
+											@if(Auth::id() === $u->id)
+												<span class="text-4xs font-bold text-[#7A7365] bg-[#FAF6EE] px-2.5 py-1 rounded-lg border border-[#D8C9B5] inline-block">
+													Active Session (You)
+												</span>
+											@else
+												<div class="flex items-center justify-end gap-1.5">
+													
+													<!-- Action 1: Suspend / Reactivate Toggle -->
+													@if($u->isSuspended())
+														<form action="{{ route('admin.users.status', $u->id) }}" method="POST" class="inline">
+															@csrf
+															<input type="hidden" name="account_status" value="active">
+															<button type="submit" title="Reactivate user access"
+																class="bg-emerald-700 hover:bg-emerald-800 text-[#FAF6EE] px-2.5 py-1 rounded-lg text-3xs font-bold transition cursor-pointer shadow-xs active:scale-95">
+																✓ Unsuspend
+															</button>
+														</form>
+													@else
+														<button type="button" onclick="openSuspendModal('{{ $u->id }}', '{{ addslashes($u->email) }}')"
+															title="Temporarily suspend user"
+															class="clay-marshmallow-subtle hover:bg-amber-100 text-amber-900 border border-amber-300 px-2 py-1 rounded-lg text-3xs font-bold transition cursor-pointer active:scale-95">
+															⏸ Suspend
+														</button>
+													@endif
+
+													<!-- Action 2: Ban / Unban Toggle -->
+													@if($u->isBanned())
+														<form action="{{ route('admin.users.status', $u->id) }}" method="POST" class="inline">
+															@csrf
+															<input type="hidden" name="account_status" value="active">
+															<button type="submit" title="Unban user"
+																class="bg-emerald-700 hover:bg-emerald-800 text-[#FAF6EE] px-2.5 py-1 rounded-lg text-3xs font-bold transition cursor-pointer shadow-xs active:scale-95">
+																🔓 Unban
+															</button>
+														</form>
+													@else
+														<button type="button" onclick="openBanModal('{{ $u->id }}', '{{ addslashes($u->email) }}')"
+															title="Permanently ban user"
+															class="bg-rose-700 hover:bg-rose-800 text-[#FAF6EE] px-2 py-1 rounded-lg text-3xs font-bold transition cursor-pointer shadow-xs active:scale-95">
+															⛔ Ban
+														</button>
+													@endif
+
+													<!-- Action 3: Reset Password Button -->
+													<button type="button" onclick="openResetPasswordModal('{{ $u->id }}', '{{ addslashes($u->email) }}')"
+														title="Direct admin password reset"
+														class="clay-marshmallow-subtle hover:bg-[#FAF6EE] text-[#5C5549] hover:text-[#191917] p-1.5 rounded-lg text-3xs font-bold transition cursor-pointer">
+														🔑
+													</button>
+
+													<!-- Action 4: Delete User Account -->
+													<form action="{{ route('admin.users.destroy', $u->id) }}" method="POST" class="inline"
+														onsubmit="return confirm('WARNING: Are you sure you want to PERMANENTLY delete user {{ addslashes($u->email) }}? This cannot be undone.')">
+														@csrf
+														@method('DELETE')
+														<button type="submit" title="Delete user account"
+															class="text-rose-700 hover:text-rose-900 hover:bg-rose-100 p-1.5 rounded-lg text-3xs transition cursor-pointer">
+															🗑️
+														</button>
+													</form>
+
+												</div>
+											@endif
+										</td>
+
 									</tr>
 									@endforeach
 								</tbody>
 							</table>
 						</div>
 					</div>
+
 				</div>
+
+				<!-- ==================== MODALS FOR USER MODERATION ==================== -->
+
+				<!-- 1. Suspend User Modal -->
+				<div id="suspend-user-modal" class="fixed inset-0 z-50 bg-[#191917]/60 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fade-in">
+					<div class="clay-marshmallow rounded-3xl p-6 sm:p-7 max-w-md w-full bg-[#FAF6EE] border border-[#E0D3C1] shadow-2xl space-y-4">
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-2.5">
+								<span class="h-9 w-9 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center font-black text-sm">
+									⏸
+								</span>
+								<div>
+									<h3 class="text-sm font-bold text-[#191917]">Suspend User Account</h3>
+									<p id="suspend-user-email-label" class="text-4xs font-mono text-[#7A7365]">user@example.com</p>
+								</div>
+							</div>
+							<button type="button" onclick="closeSuspendModal()" class="text-[#7A7365] hover:text-[#191917] text-lg cursor-pointer">&times;</button>
+						</div>
+
+						<form id="suspend-user-form" action="" method="POST" class="space-y-4">
+							@csrf
+							<input type="hidden" name="account_status" value="suspended">
+							
+							<div>
+								<label for="suspend-reason-input" class="block text-3xs font-bold uppercase text-[#7A7365] mb-1">Reason for Suspension</label>
+								<input type="text" id="suspend-reason-input" name="status_reason" placeholder="e.g. KYC audit pending, suspected payment anomaly..." required
+									class="w-full bg-[#FAF6EE] border border-[#D8C9B5] rounded-xl px-3 py-2 text-xs text-[#191917] focus:outline-none focus:ring-1 focus:ring-amber-500">
+							</div>
+
+							<div class="flex items-center justify-end gap-2 pt-2">
+								<button type="button" onclick="closeSuspendModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-[#5C5549] hover:bg-[#E8DECF] transition cursor-pointer">
+									Cancel
+								</button>
+								<button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-[#191917] transition shadow-xs cursor-pointer">
+									Confirm Suspension
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<!-- 2. Ban User Modal -->
+				<div id="ban-user-modal" class="fixed inset-0 z-50 bg-[#191917]/60 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fade-in">
+					<div class="clay-marshmallow rounded-3xl p-6 sm:p-7 max-w-md w-full bg-[#FAF6EE] border border-rose-200 shadow-2xl space-y-4">
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-2.5">
+								<span class="h-9 w-9 rounded-xl bg-rose-100 text-rose-900 flex items-center justify-center font-black text-sm">
+									⛔
+								</span>
+								<div>
+									<h3 class="text-sm font-bold text-rose-900">Ban User Account</h3>
+									<p id="ban-user-email-label" class="text-4xs font-mono text-[#7A7365]">user@example.com</p>
+								</div>
+							</div>
+							<button type="button" onclick="closeBanModal()" class="text-[#7A7365] hover:text-[#191917] text-lg cursor-pointer">&times;</button>
+						</div>
+
+						<form id="ban-user-form" action="" method="POST" class="space-y-4">
+							@csrf
+							<input type="hidden" name="account_status" value="banned">
+							
+							<div>
+								<label for="ban-reason-input" class="block text-3xs font-bold uppercase text-[#7A7365] mb-1">Reason for Permanent Ban</label>
+								<input type="text" id="ban-reason-input" name="status_reason" placeholder="e.g. Fraudulent activity, chargeback violation..." required
+									class="w-full bg-[#FAF6EE] border border-rose-300 rounded-xl px-3 py-2 text-xs text-[#191917] focus:outline-none focus:ring-1 focus:ring-rose-500">
+							</div>
+
+							<div class="flex items-center justify-end gap-2 pt-2">
+								<button type="button" onclick="closeBanModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-[#5C5549] hover:bg-[#E8DECF] transition cursor-pointer">
+									Cancel
+								</button>
+								<button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-700 hover:bg-rose-800 text-[#FAF6EE] transition shadow-xs cursor-pointer">
+									Enforce Permanent Ban
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<!-- 3. Admin Reset Password Modal -->
+				<div id="reset-password-modal" class="fixed inset-0 z-50 bg-[#191917]/60 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fade-in">
+					<div class="clay-marshmallow rounded-3xl p-6 sm:p-7 max-w-md w-full bg-[#FAF6EE] border border-[#E0D3C1] shadow-2xl space-y-4">
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-2.5">
+								<span class="h-9 w-9 rounded-xl bg-[#191917] text-[#FFD000] flex items-center justify-center font-black text-sm">
+									🔑
+								</span>
+								<div>
+									<h3 class="text-sm font-bold text-[#191917]">Direct Password Reset</h3>
+									<p id="reset-pwd-email-label" class="text-4xs font-mono text-[#7A7365]">user@example.com</p>
+								</div>
+							</div>
+							<button type="button" onclick="closeResetPasswordModal()" class="text-[#7A7365] hover:text-[#191917] text-lg cursor-pointer">&times;</button>
+						</div>
+
+						<form id="reset-password-form" action="" method="POST" class="space-y-3.5">
+							@csrf
+							<div>
+								<label for="new-admin-password-input" class="block text-3xs font-bold uppercase text-[#7A7365] mb-1">New Password (min 8 chars)</label>
+								<input type="password" id="new-admin-password-input" name="password" minlength="8" required
+									class="w-full bg-[#FAF6EE] border border-[#D8C9B5] rounded-xl px-3 py-2 text-xs text-[#191917] focus:outline-none focus:ring-1 focus:ring-[#FFD000]">
+							</div>
+
+							<div>
+								<label for="confirm-admin-password-input" class="block text-3xs font-bold uppercase text-[#7A7365] mb-1">Confirm New Password</label>
+								<input type="password" id="confirm-admin-password-input" name="password_confirmation" minlength="8" required
+									class="w-full bg-[#FAF6EE] border border-[#D8C9B5] rounded-xl px-3 py-2 text-xs text-[#191917] focus:outline-none focus:ring-1 focus:ring-[#FFD000]">
+							</div>
+
+							<div class="flex items-center justify-end gap-2 pt-2">
+								<button type="button" onclick="closeResetPasswordModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-[#5C5549] hover:bg-[#E8DECF] transition cursor-pointer">
+									Cancel
+								</button>
+								<button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#191917] hover:bg-[#333333] text-[#FFD000] transition shadow-xs cursor-pointer">
+									Update Password
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
 				@endif
 
 			</div>
@@ -610,6 +846,43 @@
 			if (select && formTier) {
 				formTier.value = select.value;
 			}
+		}
+
+		// Suspend Modal Controllers
+		function openSuspendModal(userId, userEmail) {
+			document.getElementById('suspend-user-form').action = `/admin/users/${userId}/status`;
+			document.getElementById('suspend-user-email-label').innerText = userEmail;
+			document.getElementById('suspend-reason-input').value = '';
+			document.getElementById('suspend-user-modal').classList.remove('hidden');
+		}
+
+		function closeSuspendModal() {
+			document.getElementById('suspend-user-modal').classList.add('hidden');
+		}
+
+		// Ban Modal Controllers
+		function openBanModal(userId, userEmail) {
+			document.getElementById('ban-user-form').action = `/admin/users/${userId}/status`;
+			document.getElementById('ban-user-email-label').innerText = userEmail;
+			document.getElementById('ban-reason-input').value = '';
+			document.getElementById('ban-user-modal').classList.remove('hidden');
+		}
+
+		function closeBanModal() {
+			document.getElementById('ban-user-modal').classList.add('hidden');
+		}
+
+		// Reset Password Modal Controllers
+		function openResetPasswordModal(userId, userEmail) {
+			document.getElementById('reset-password-form').action = `/admin/users/${userId}/reset-password`;
+			document.getElementById('reset-pwd-email-label').innerText = userEmail;
+			document.getElementById('new-admin-password-input').value = '';
+			document.getElementById('confirm-admin-password-input').value = '';
+			document.getElementById('reset-password-modal').classList.remove('hidden');
+		}
+
+		function closeResetPasswordModal() {
+			document.getElementById('reset-password-modal').classList.add('hidden');
 		}
 	</script>
 </x-layout>

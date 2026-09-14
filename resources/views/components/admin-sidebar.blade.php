@@ -17,15 +17,6 @@
 					<span class="block text-4xs font-bold text-[#7A7365] uppercase tracking-wider">Admin Console</span>
 				</div>
 			</a>
-			
-			<!-- SuperAdmin Badge -->
-			<div class="flex items-center justify-between px-3 py-1.5 rounded-xl bg-[#191917] text-[#FAF6EE] text-4xs shadow-2xs">
-				<span class="flex items-center gap-1.5 font-bold">
-					<span class="h-2 w-2 rounded-full bg-[#FFD000] animate-pulse"></span>
-					<span>SuperAdmin Controls</span>
-				</span>
-				<span class="font-mono text-[#FFD000] text-3xs font-black">ROOT</span>
-			</div>
 		</div>
 
 		<!-- Admin Navigation Links -->

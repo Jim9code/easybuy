@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CartItem;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Payment;
 use App\Models\Product;
+use App\Models\OrderItem;
+use App\Models\CartItem;
+use App\Models\Payment;
+use App\Models\Order;
 use App\Services\PaystackService;
+use App\Mail\OrderReceiptMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -42,14 +44,20 @@ class PaymentController extends Controller
             return redirect()->route('catalog')->with('info', 'Your procurement cart is currently empty. Add items from the catalog to checkout.');
         }
 
-        $subtotal = $cartItems->sum(fn($i) => $i->unit_price * $i->quantity);
-        $retailMsrp = $cartItems->sum(function($i) {
+        $subtotal = (float) $cartItems->sum(fn($i) => $i->unit_price * $i->quantity);
+        $retailMsrp = (float) $cartItems->sum(function($i) {
             $msrp = $i->product->msrp ?: ($i->unit_price * 1.45);
             return $msrp * $i->quantity;
         });
         $savings = max(0, $retailMsrp - $subtotal);
+        $savingsPercentage = $retailMsrp > 0 ? round(($savings / $retailMsrp) * 100, 1) : 31;
 
-        return view('checkout', compact('cartItems', 'subtotal', 'retailMsrp', 'savings', 'user'));
+        // Consolidated Freight (5% Dynamic Rate, Minimum ₦1,000.00 Floor) & 7.5% Nigerian Statutory VAT
+        $shippingAmount = $subtotal > 0 ? max(1000.00, round($subtotal * 0.05, 2)) : 0.00;
+        $vatAmount = round($subtotal * 0.075, 2);
+        $totalAmount = round($subtotal + $shippingAmount + $vatAmount, 2);
+
+        return view('checkout', compact('cartItems', 'subtotal', 'retailMsrp', 'savings', 'savingsPercentage', 'shippingAmount', 'vatAmount', 'totalAmount', 'user'));
     }
 
     /**
@@ -60,10 +68,13 @@ class PaymentController extends Controller
         $request->validate([
             'email' => 'required|email',
             'company_name' => 'nullable|string|max:255',
+            'contact_name' => 'nullable|string|max:255',
+            'phone' => 'required|string|max:35',
+            'country' => 'required|string|max:100',
             'shipping_address' => 'required|string',
-            'city' => 'required|string',
-            'state' => 'required|string',
-            'zip' => 'nullable|string',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
+            'zip' => 'nullable|string|max:20',
             'payment_method' => 'required|string|in:paystack,net30,net60',
         ]);
 
@@ -84,8 +95,10 @@ class PaymentController extends Controller
             return redirect()->route('cart')->with('error', 'Cart is empty');
         }
 
-        $subtotal = $cartItems->sum(fn($i) => $i->unit_price * $i->quantity);
-        $totalAmount = $subtotal; // B2B Consolidated delivery inclusive
+        $subtotal = (float) $cartItems->sum(fn($i) => $i->unit_price * $i->quantity);
+        $shippingAmount = $subtotal > 0 ? max(1000.00, round($subtotal * 0.05, 2)) : 0.00;
+        $vatAmount = round($subtotal * 0.075, 2);
+        $totalAmount = round($subtotal + $shippingAmount + $vatAmount, 2);
 
         $orderNumber = 'EB-PO-' . strtoupper(dechex(time())) . rand(10, 99);
         $invoiceRef = 'EB-INV-' . date('Y') . '-' . rand(1000, 9999);
@@ -98,19 +111,22 @@ class PaymentController extends Controller
                 'order_number' => $orderNumber,
                 'user_id' => $userId ?: 1, // Default buyer or guest linked
                 'subtotal' => $subtotal,
-                'tax_amount' => 0.00,
-                'shipping_amount' => 0.00,
+                'tax_amount' => $vatAmount,
+                'shipping_amount' => $shippingAmount,
                 'total_amount' => $totalAmount,
                 'payment_status' => $request->payment_method === 'paystack' ? 'pending' : $request->payment_method,
                 'fulfillment_status' => 'processing',
                 'single_invoice_ref' => $invoiceRef,
                 'shipping_address' => [
-                    'company' => $request->company_name ?: ($user->company_name ?? 'Procurement Department'),
+                    'company' => $request->company_name ?: ($user->company_name ?? 'EasyBuy Technologies Nigeria Ltd'),
+                    'contact_name' => $request->contact_name ?: ($user->name ?? $user->username ?? 'Procurement Officer'),
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'country' => $request->country ?? 'Nigeria',
                     'address' => $request->shipping_address,
                     'city' => $request->city,
                     'state' => $request->state,
                     'zip' => $request->zip ?? '',
-                    'email' => $request->email,
                 ],
                 'notes' => $request->notes ?? 'Consolidated single-invoice B2B order.',
             ]);
@@ -139,6 +155,10 @@ class PaymentController extends Controller
                 })->delete();
 
                 DB::commit();
+
+                // Trigger automatic email receipt dispatch to customer
+                $this->sendReceiptEmail($order);
+
                 return redirect()->route('order.invoice', ['orderNumber' => $order->order_number])
                     ->with('success', "Order {$orderNumber} successfully issued under {$request->payment_method} corporate terms!");
             }
@@ -167,7 +187,9 @@ class PaymentController extends Controller
                 'metadata' => [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
-                    'buyer_name' => $user->username ?? 'Buyer',
+                    'buyer_name' => $request->contact_name ?: ($user->username ?? 'Buyer'),
+                    'phone' => $request->phone,
+                    'company' => $request->company_name,
                 ]
             ]);
 
@@ -229,6 +251,9 @@ class PaymentController extends Controller
                 else $query->where('session_id', session()->getId());
             })->delete();
 
+            // Trigger automatic email receipt dispatch to customer
+            $this->sendReceiptEmail($order);
+
             return redirect()->route('order.invoice', ['orderNumber' => $order->order_number])
                 ->with('success', 'Payment confirmed via Paystack! Single consolidated tax invoice is ready.');
         }
@@ -250,6 +275,57 @@ class PaymentController extends Controller
             ->firstOrFail();
 
         return view('invoice', compact('order'));
+    }
+
+    /**
+     * Re-send / Trigger Email Receipt to Customer
+     */
+    public function resendEmail(Request $request, $orderNumber)
+    {
+        $order = Order::with(['items.product', 'payment', 'user'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        $recipientEmail = $order->shipping_address['email'] ?? ($order->user->email ?? null);
+
+        if (!$recipientEmail) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No destination email address associated with this invoice.'
+            ], 422);
+        }
+
+        $sent = $this->sendReceiptEmail($order);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Official invoice receipt successfully dispatched to {$recipientEmail}!"
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Invoice receipt sent to {$recipientEmail}!");
+    }
+
+    /**
+     * Helper to safely dispatch order receipt emails without throwing fatal exceptions
+     */
+    protected function sendReceiptEmail(Order $order): bool
+    {
+        $recipientEmail = $order->shipping_address['email'] ?? ($order->user->email ?? null);
+        if (!$recipientEmail) {
+            Log::warning("Order #{$order->order_number} has no destination email for receipt.");
+            return false;
+        }
+
+        try {
+            Mail::to($recipientEmail)->send(new OrderReceiptMail($order));
+            Log::info("Order receipt email successfully sent to {$recipientEmail} for order #{$order->order_number}");
+            return true;
+        } catch (\Throwable $e) {
+            Log::error("Failed to deliver order receipt email to {$recipientEmail}: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -281,6 +357,9 @@ class PaymentController extends Controller
                         'payment_status' => 'paid',
                         'fulfillment_status' => 'processing',
                     ]);
+
+                    // Send receipt email
+                    $this->sendReceiptEmail($payment->order);
                 }
             }
         }

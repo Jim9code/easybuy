@@ -6,7 +6,7 @@
 		<x-dashboard-sidebar active="home" />
 
 		<!-- ==================== CENTER AI AGENT CANVAS ("ASK EASY") ==================== -->
-		<main class="flex-1 h-full overflow-y-auto p-4 sm:p-8 lg:p-12 relative flex flex-col items-center">
+		<main class="flex-1 h-full overflow-y-auto p-4 sm:p-8 lg:p-12 pb-28 lg:pb-12 relative flex flex-col items-center">
 			
 			<!-- Centered Container (Spacious Layout for Grid Rows & Columns) -->
 			<div class="w-full max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto space-y-6 sm:space-y-7 my-auto transition-all duration-300">
@@ -29,7 +29,7 @@
 						<textarea id="easy-prompt" 
 							rows="3"
 							oninput="autoExpandPrompt()"
-							placeholder="Ask Easy anything... e.g. Source 10 ergonomic mesh chairs and 20x 4K USB-C monitors under $5,000 with unified delivery"
+							placeholder="Ask Easy anything... e.g. Source 10 ergonomic mesh chairs and 20x 4K USB-C monitors with unified delivery"
 							class="w-full rounded-2xl clay-input-pill p-4 sm:p-5 text-xs sm:text-sm text-[#191917] placeholder:text-[#9C9283] border border-[#D8C9B5]/70 focus:outline-none focus:border-[#C4B29B] transition leading-relaxed overflow-hidden min-h-[105px] resize-none"></textarea>
 					</div>
 
@@ -223,7 +223,7 @@
 						<div class="text-left w-full sm:w-auto">
 							<span id="easy-total-footer-label" class="text-4xs text-[#7A7365] uppercase tracking-wider block">Consolidated Total (Single PO & Delivery)</span>
 							<div class="flex items-baseline gap-2 mt-0.5">
-								<div id="easy-response-total" class="text-2xl sm:text-3xl font-black text-[#191917] price-text tracking-tight">$0.00</div>
+								<div id="easy-response-total" class="text-2xl sm:text-3xl font-black text-[#191917] price-text tracking-tight">₦0.00</div>
 								<span id="easy-footer-savings-badge" class="text-4xs text-emerald-800 font-bold bg-emerald-100 px-2.5 py-1 rounded-md">Wholesale Discount Applied</span>
 							</div>
 						</div>
@@ -280,17 +280,17 @@
 
 		// Suggestions Dictionary
 		const EASY_SUGGESTIONS = {
-			dev_setup: "Onboard 5 Developers:\n- 5x Ergonomic mesh task chairs\n- 10x 27-inch 4K USB-C monitors\n- 5x Heavy-duty dual monitor arms\n- 5x Wireless mechanical keyboard combos\nBudget target: $6,500.",
+			dev_setup: "Onboard 5 Developers:\n- 5x Ergonomic mesh task chairs\n- 10x 27-inch 4K USB-C monitors\n- 5x Heavy-duty dual monitor arms\n- 5x Wireless mechanical keyboard combos\nTarget: High-spec workspace.",
 			office_restock: "Monthly Office Restock:\n- 24 rolls 2-ply recycled tissue\n- 12x multi-surface disinfectant sprays\n- 500x compostable hot coffee cups\n- 4kg organic whole bean dark roast espresso",
 			studio_gear: "Design Studio Fit-out:\n- 4x Curved terracotta arch LED lamps\n- 4x Smart wireless charging desktop hubs\n- 6x Acoustic felt desktop divider panels",
-			spreadsheet_list: "Item Code | Item Name | Quantity | Target Max\nSKU-ERG-01 | Ergonomic Mesh Chairs | 8 | $150\nSKU-MON-4K | 27-inch 4K Monitors | 16 | $220\nSKU-DSK-STD | Dual Motor Standing Desks | 8 | $320"
+			spreadsheet_list: "Item Code | Item Name | Quantity | Target Max\nSKU-ERG-01 | Ergonomic Mesh Chairs | 8 | ₦150,000\nSKU-MON-4K | 27-inch 4K Monitors | 16 | ₦220,000\nSKU-DSK-STD | Dual Motor Standing Desks | 8 | ₦320,000"
 		};
 
 		// Detailed Factory Sourcing Datasets (Aligned with databaseplan.md schema)
 		const SOURCED_DATASETS = {
 			dev_setup: {
-				savings: "Saved $1,340.00 (32.1% Wholesale)",
-				total: "$5,160.00",
+				savings: "Saved ₦1,340,000.00 (32.1% Wholesale)",
+				total: "₦5,160,000.00",
 				summary: "I've analyzed your engineering workstation requisition and cross-referenced with our Tier-1 manufacturers. Matched 5x Ergonomic Lumbar Mesh Task Chairs (ANSI/BIFMA certified), 10x 27-inch 4K UHD IPS USB-C Displays, and 5x Dual-Motor Standing Desks.\n\nAll items meet commercial durability standards with multi-year factory warranties. Sourced at 32.1% below retail MSRP, consolidated into 1 single Purchase Order and unified dock delivery.",
 				items: [
 					{
@@ -300,8 +300,8 @@
 						category: "Ergonomics",
 						image: "{{ asset('images/3d-refs/ergo_chair.jpg') }}",
 						qty: 5,
-						unitPrice: 140.00,
-						msrp: 220.00,
+						unitPrice: 140000.00,
+						msrp: 220000.00,
 						leadTime: "2-3 Days Dispatch",
 						warranty: "3-Year Direct Replacement",
 						stock: "120 Units Available",
@@ -322,8 +322,8 @@
 						category: "IT & Tech",
 						image: "{{ asset('images/3d-refs/4k_display.jpg') }}",
 						qty: 10,
-						unitPrice: 220.00,
-						msrp: 320.00,
+						unitPrice: 220000.00,
+						msrp: 320000.00,
 						leadTime: "24h Express Dispatch",
 						warranty: "3-Year Zero-Dead-Pixel",
 						stock: "65 Units Available",
@@ -344,8 +344,8 @@
 						category: "Ergonomics",
 						image: "{{ asset('images/3d-refs/standing_desk.jpg') }}",
 						qty: 5,
-						unitPrice: 290.00,
-						msrp: 450.00,
+						unitPrice: 290000.00,
+						msrp: 450000.00,
 						leadTime: "3 Days Dispatch",
 						warranty: "5-Year Motor Warranty",
 						stock: "40 Units Available",
@@ -362,8 +362,8 @@
 				]
 			},
 			office_restock: {
-				savings: "Saved $240.00 (38.1% Wholesale)",
-				total: "$390.00",
+				savings: "Saved ₦240,000.00 (38.1% Wholesale)",
+				total: "₦390,000.00",
 				summary: "I've matched your monthly facility restock requisition with our certified commercial wholesale suppliers. Sourced 2x 24-roll cases of 2-ply recycled commercial bath tissue (48 rolls total), 12x EPA-certified hospital-grade disinfectant sprays, and 2x 4kg whole bean dark roast espresso bags.\n\nAll items feature bulk wholesale tier discounts saving 38.1% vs retail pricing. Consolidated into 1 unified logistics drop for single-invoice Net terms.",
 				items: [
 					{
@@ -373,8 +373,8 @@
 						category: "Janitorial & Restocks",
 						image: "{{ asset('images/3d-refs/smart_hub.jpg') }}",
 						qty: 2,
-						unitPrice: 32.00,
-						msrp: 52.00,
+						unitPrice: 32000.00,
+						msrp: 52000.00,
 						leadTime: "Same Day Dispatch",
 						warranty: "100% Quality Guaranteed",
 						stock: "350 Cases in Stock",
@@ -394,8 +394,8 @@
 						category: "Janitorial & Restocks",
 						image: "{{ asset('images/3d-refs/modern_lamp.jpg') }}",
 						qty: 1,
-						unitPrice: 48.00,
-						msrp: 75.00,
+						unitPrice: 48000.00,
+						msrp: 75000.00,
 						leadTime: "24h Dispatch",
 						warranty: "EPA Certified",
 						stock: "180 Cases in Stock",
@@ -415,8 +415,8 @@
 						category: "Janitorial & Restocks",
 						image: "{{ asset('images/3d-refs/smart_hub.jpg') }}",
 						qty: 2,
-						unitPrice: 58.00,
-						msrp: 95.00,
+						unitPrice: 58000.00,
+						msrp: 95000.00,
 						leadTime: "Fresh Batch Roasted Weekly",
 						warranty: "Direct Farm Traceability",
 						stock: "90 Bags in Stock",
@@ -432,8 +432,8 @@
 				]
 			},
 			studio_gear: {
-				savings: "Saved $580.00 (34.9% Wholesale)",
-				total: "$1,080.00",
+				savings: "Saved ₦580,000.00 (34.9% Wholesale)",
+				total: "₦1,080,000.00",
 				summary: "I've cross-referenced your creative studio fit-out list with our architectural workspace manufacturers. Sourced 4x curved terracotta arch LED lamps (95+ CRI color accuracy with stepless touch dimming), 4x CNC-aluminum wireless charging desktop hubs, and 6x acoustic PET felt privacy screens.\n\nAll items are factory-vetted and packaged together under 1 consolidated commercial invoice with 34.9% wholesale savings.",
 				items: [
 					{
@@ -443,8 +443,8 @@
 						category: "Lighting & Facilities",
 						image: "{{ asset('images/3d-refs/modern_lamp.jpg') }}",
 						qty: 4,
-						unitPrice: 95.00,
-						msrp: 155.00,
+						unitPrice: 95000.00,
+						msrp: 155000.00,
 						leadTime: "2 Days Dispatch",
 						warranty: "3-Year LED Module Warranty",
 						stock: "55 Units in Stock",
@@ -464,8 +464,8 @@
 						category: "IT & Tech",
 						image: "{{ asset('images/3d-refs/smart_hub.jpg') }}",
 						qty: 4,
-						unitPrice: 75.00,
-						msrp: 120.00,
+						unitPrice: 75000.00,
+						msrp: 120000.00,
 						leadTime: "24h Dispatch",
 						warranty: "2-Year Direct Replacement",
 						stock: "75 Units in Stock",
@@ -485,8 +485,8 @@
 						category: "Facilities",
 						image: "{{ asset('images/3d-refs/ergo_chair.jpg') }}",
 						qty: 1,
-						unitPrice: 280.00,
-						msrp: 420.00,
+						unitPrice: 280000.00,
+						msrp: 420000.00,
 						leadTime: "3 Days Dispatch",
 						warranty: "Commercial Grade",
 						stock: "30 Packs in Stock",
@@ -502,9 +502,9 @@
 				]
 			},
 			spreadsheet_list: {
-				savings: "Saved $780.00 (31.2% Wholesale)",
-				total: "$1,720.00",
-				summary: "Parsed your tabular Bill of Materials (BOM) spreadsheet and resolved all item codes against live factory production batches. Matched 8x ANSI/BIFMA mesh task chairs, 16x 4K UHD monitors, and 8x dual-motor standing desks with guaranteed volume pricing.\n\nEverything is grouped under 1 consolidated Purchase Order saving $780.00 (31.2% wholesale) compared to split retail suppliers.",
+				savings: "Saved ₦780,000.00 (31.2% Wholesale)",
+				total: "₦1,720,000.00",
+				summary: "Parsed your tabular Bill of Materials (BOM) spreadsheet and resolved all item codes against live factory production batches. Matched 8x ANSI/BIFMA mesh task chairs, 16x 4K UHD monitors, and 8x dual-motor standing desks with guaranteed volume pricing.\n\nEverything is grouped under 1 consolidated Purchase Order saving ₦780,000.00 (31.2% wholesale) compared to split retail suppliers.",
 				items: [
 					{
 						id: "res-sp-1",
@@ -755,8 +755,8 @@
 
 					<!-- Price & Quantity Breakdown -->
 					<div class="mt-3 pt-2.5 border-t border-[#E0D3C1]/50 flex items-center justify-between px-1">
-						<span class="text-3xs text-[#7A7365] font-medium price-text">${item.qty} × $${item.unitPrice.toFixed(2)}</span>
-						<span class="text-sm sm:text-base font-bold text-[#191917] price-text">$${lineTotal}</span>
+						<span class="text-3xs text-[#7A7365] font-medium price-text">${item.qty} × ₦${parseFloat(item.unitPrice).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+						<span class="text-sm sm:text-base font-bold text-[#191917] price-text">₦${parseFloat(lineTotal).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
 					</div>
 				`;
 
@@ -825,8 +825,8 @@
 					currentConversationId = result.conversation_id;
 					const data = result.structured_data;
 					currentActiveDataset = {
-						savings: `Saved $${parseFloat(data.savings || 0).toLocaleString('en-US', {minimumFractionDigits: 2})} (${data.savings_percent || '32%'} Wholesale)`,
-						total: `$${parseFloat(data.wholesale_total || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`,
+						savings: `Saved ₦${parseFloat(data.savings || 0).toLocaleString('en-US', {minimumFractionDigits: 2})} (${data.savings_percent || '32%'} Wholesale)`,
+						total: `₦${parseFloat(data.wholesale_total || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`,
 						summary: result.assistant_message || data.summary || null,
 						items: data.line_items.map(item => ({
 							id: item.id || item.sku,

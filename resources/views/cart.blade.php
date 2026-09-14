@@ -6,9 +6,9 @@
 		<x-dashboard-sidebar active="cart" />
 
 		<!-- ==================== CENTER CART CANVAS ==================== -->
-		<main class="flex-1 h-full overflow-y-auto p-4 sm:p-8 lg:p-12 relative">
+		<main class="flex-1 h-full overflow-y-auto p-4 sm:p-8 lg:p-12 pb-28 lg:pb-12 relative">
 			
-			<div class="max-w-5xl mx-auto space-y-6 animate-fade-in">
+			<div class="max-w-5xl mx-auto space-y-6 animate-fade-in pb-6">
 				
 				<!-- Top Breadcrumbs & Back Navigation -->
 				<div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#E0D3C1]/50">
@@ -19,6 +19,13 @@
 						<span>Continue Sourcing (Ask Easy)</span>
 					</a>
 					<div class="flex items-center gap-2">
+						<button type="button" onclick="toggleDashboardSidebar()" title="Toggle Sidebar Navigation"
+							class="sidebar-toggle-inline-btn clay-marshmallow-subtle px-3 py-1.5 rounded-xl text-3xs font-bold text-[#5C5549] hover:text-[#191917] hover:border-[#191917] transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+							<svg class="h-3 w-3 text-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+							</svg>
+							<span class="btn-label">Hide Sidebar</span>
+						</button>
 						<a href="{{ url('/home') }}#standing-orders-section" class="clay-marshmallow-subtle hover:bg-[#FAF6EE] px-3.5 py-1.5 rounded-xl text-3xs font-bold text-purple-900 border border-purple-200/60 transition flex items-center gap-1.5">
 							<span>🔄 Standing Orders</span>
 						</a>
@@ -81,15 +88,23 @@
 					<div class="lg:col-span-4 space-y-4">
 						
 						<div class="clay-marshmallow p-6 sm:p-7 rounded-3xl space-y-5 sticky top-4 select-none">
-							<h2 class="text-base font-bold text-[#191917] pb-3 border-b border-[#E0D3C1]/50">
-								Order Summary
-							</h2>
+							<div class="flex items-center justify-between pb-3 border-b border-[#E0D3C1]/50">
+								<h2 class="text-base font-bold text-[#191917]">
+									Order Summary
+								</h2>
+								<span class="text-4xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+									Single Invoice
+								</span>
+							</div>
 
 							<div class="space-y-3 text-xs">
 								<!-- Items Subtotal -->
 								<div class="flex justify-between text-[#5C5549]">
-									<span>Items Subtotal</span>
-									<span id="summary-subtotal" class="font-bold text-[#191917] price-text">$0.00</span>
+									<div>
+										<span class="block text-[#191917] font-medium">Items Wholesale Subtotal</span>
+										<span class="text-4xs text-[#7A7365]">Factory direct rate</span>
+									</div>
+									<span id="summary-subtotal" class="font-bold text-[#191917] price-text">₦0.00</span>
 								</div>
 
 								<!-- Wholesale Savings Callout -->
@@ -98,30 +113,45 @@
 										<svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
-										<span class="font-bold text-3xs uppercase tracking-wider">Wholesale Savings</span>
+										<div>
+											<span class="font-bold text-3xs uppercase tracking-wider block">Wholesale Margin Saved</span>
+											<span class="text-4xs text-[#5C5549] block">Saved vs. retail MSRP baseline</span>
+										</div>
 									</div>
-									<span id="summary-savings" class="font-bold price-text">-$0.00</span>
+									<span id="summary-savings" class="font-bold price-text text-right">-₦0.00</span>
 								</div>
 
-								<!-- Delivery -->
-								<div class="flex justify-between text-[#5C5549] text-3xs">
-									<span>Unified Delivery</span>
-									<span class="font-bold text-emerald-800 uppercase tracking-wider">FREE (Single Drop)</span>
+								<!-- Consolidated Delivery Fee (Dynamic 5% Rate, Min ₦1,000) -->
+								<div class="flex justify-between text-[#5C5549] text-xs">
+									<div>
+										<span class="block text-[#191917] font-medium">Consolidated Shipping</span>
+										<span class="text-4xs text-[#7A7365]">Single destination freight dispatch (5% of order, min ₦1,000)</span>
+									</div>
+									<span id="summary-shipping" class="font-bold text-[#191917] price-text">₦0.00</span>
+								</div>
+
+								<!-- VAT / Sales Tax -->
+								<div class="flex justify-between text-[#5C5549] text-xs">
+									<div>
+										<span class="block text-[#191917] font-medium">Value Added Tax (VAT 7.5%)</span>
+										<span class="text-4xs text-[#7A7365]">Commercial statutory rate</span>
+									</div>
+									<span id="summary-vat" class="font-bold text-[#191917] price-text">₦0.00</span>
 								</div>
 
 								<!-- Factory Inspection & Warranty -->
-								<div class="flex justify-between text-[#5C5549] text-3xs">
-									<span>Factory Warranty & Inspection</span>
+								<div class="flex justify-between text-[#5C5549] text-3xs pt-1 border-t border-[#E0D3C1]/30">
+									<span>Factory QA Inspection & Warranty</span>
 									<span class="font-bold text-emerald-800 uppercase tracking-wider">Included</span>
 								</div>
 
 								<!-- Estimated Total -->
 								<div class="pt-4 border-t border-[#E0D3C1]/50 flex justify-between items-baseline">
 									<div>
-										<span class="text-xs font-bold text-[#191917] block">Estimated Total</span>
-										<span class="text-4xs text-[#7A7365]">All fees included</span>
+										<span class="text-xs font-bold text-[#191917] block">Estimated Grand Total</span>
+										<span class="text-4xs text-[#7A7365]">Subtotal + Freight + 7.5% VAT</span>
 									</div>
-									<span id="summary-total" class="text-2xl sm:text-3xl font-black text-[#191917] price-text">$0.00</span>
+									<span id="summary-total" class="text-2xl sm:text-3xl font-black text-[#191917] price-text">₦0.00</span>
 								</div>
 							</div>
 
@@ -187,6 +217,8 @@
 			const emptyState = document.getElementById('cart-page-empty');
 			const subtotalEl = document.getElementById('summary-subtotal');
 			const savingsEl = document.getElementById('summary-savings');
+			const shippingEl = document.getElementById('summary-shipping');
+			const vatEl = document.getElementById('summary-vat');
 			const totalEl = document.getElementById('summary-total');
 			const topBadge = document.getElementById('cart-item-badge-top');
 			const checkoutBtn = document.getElementById('cart-checkout-btn');
@@ -196,7 +228,19 @@
 			const items = window.EasyBuyCart.items || [];
 			const totalCount = window.EasyBuyCart.getCount();
 			const totalSum = window.EasyBuyCart.getTotal();
-			const savingsSum = totalSum * 0.34;
+			
+			// Wholesale Savings calculation vs standard Retail MSRP (typically ~45% markup over factory rate)
+			const retailTotal = items.reduce((sum, item) => {
+				const unitMSRP = item.msrp ? parseFloat(item.msrp) : (parseFloat(item.price) * 1.45);
+				return sum + (unitMSRP * (item.qty || 1));
+			}, 0);
+			const savingsSum = Math.max(0, retailTotal - totalSum);
+			const savingsPercent = retailTotal > 0 ? Math.round((savingsSum / retailTotal) * 100) : 31;
+
+			// Dynamic 5% Consolidated Freight (Min ₦1,000.00 Floor) & 7.5% VAT Calculation
+			const shippingFee = items.length > 0 ? Math.max(1000.00, totalSum * 0.05) : 0.00;
+			const vatAmount = totalSum * 0.075;
+			const grandTotal = totalSum + shippingFee + vatAmount;
 
 			// Update top badge
 			if (topBadge) {
@@ -207,9 +251,11 @@
 			if (items.length === 0) {
 				container.innerHTML = '';
 				if (emptyState) emptyState.classList.remove('hidden');
-				if (subtotalEl) subtotalEl.innerText = '$0.00';
-				if (savingsEl) savingsEl.innerText = '-$0.00';
-				if (totalEl) totalEl.innerText = '$0.00';
+				if (subtotalEl) subtotalEl.innerText = '₦0.00';
+				if (savingsEl) savingsEl.innerText = '-₦0.00';
+				if (shippingEl) shippingEl.innerText = '₦0.00';
+				if (vatEl) vatEl.innerText = '₦0.00';
+				if (totalEl) totalEl.innerText = '₦0.00';
 				if (checkoutBtn) {
 					checkoutBtn.disabled = true;
 					checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -224,15 +270,18 @@
 			}
 
 			// Update Summary Numbers
-			if (subtotalEl) subtotalEl.innerText = `$${totalSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-			if (savingsEl) savingsEl.innerText = `-$${savingsSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (34% wholesale)`;
-			if (totalEl) totalEl.innerText = `$${totalSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+			if (subtotalEl) subtotalEl.innerText = `₦${totalSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+			if (savingsEl) savingsEl.innerText = `-₦${savingsSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${savingsPercent}% off retail)`;
+			if (shippingEl) shippingEl.innerText = `₦${shippingFee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+			if (vatEl) vatEl.innerText = `₦${vatAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+			if (totalEl) totalEl.innerText = `₦${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 			// Render Line Items
 			container.innerHTML = items.map(item => {
 				const itemImg = getProductImage(item);
-				const lineTotal = (item.price * item.qty).toFixed(2);
+				const lineTotal = (item.price * item.qty).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 				const detailUrl = "{{ url('/home/product') }}/" + item.id;
+				const formattedPrice = parseFloat(item.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 				return `
 					<div class="clay-marshmallow rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 select-none transition group">
@@ -256,7 +305,7 @@
 									${item.name}
 								</a>
 								<p class="text-3xs text-[#7A7365] price-text">
-									$${parseFloat(item.price).toFixed(2)} each • Direct Factory Line
+									₦${formattedPrice} each • Direct Factory Line
 								</p>
 							</div>
 						</div>
@@ -274,8 +323,8 @@
 							</div>
 
 							<!-- Line Item Total -->
-							<div class="text-right min-w-[80px]">
-								<span class="text-xs sm:text-sm font-bold text-[#191917] price-text block">$${lineTotal}</span>
+							<div class="text-right min-w-[90px]">
+								<span class="text-xs sm:text-sm font-bold text-[#191917] price-text block">₦${lineTotal}</span>
 								<span class="text-4xs text-emerald-800 font-bold block">Wholesale</span>
 							</div>
 

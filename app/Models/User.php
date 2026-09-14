@@ -19,6 +19,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'account_status',
+        'status_reason',
+        'banned_at',
         'company_name',
         'phone',
         'avatar_url'
@@ -34,6 +37,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'banned_at' => 'datetime',
         ];
     }
 
@@ -50,6 +54,21 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function isActive(): bool
+    {
+        return ($this->account_status ?? 'active') === 'active';
+    }
+
+    public function isSuspended(): bool
+    {
+        return ($this->account_status ?? 'active') === 'suspended';
+    }
+
+    public function isBanned(): bool
+    {
+        return ($this->account_status ?? 'active') === 'banned';
     }
 
     public function supplierProfile(): HasOne

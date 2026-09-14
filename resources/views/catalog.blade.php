@@ -6,11 +6,11 @@
 		<x-dashboard-sidebar active="catalog" />
 
 		<!-- ==================== CENTER CATALOG CANVAS ==================== -->
-		<main class="flex-1 h-full overflow-y-auto p-4 sm:p-6 lg:p-10 relative">
+		<main class="flex-1 h-full overflow-y-auto p-4 sm:p-6 lg:p-8 xl:p-10 pb-28 lg:pb-12 relative">
 			
-			<div class="max-w-6xl mx-auto space-y-6 sm:space-y-7 animate-fade-in pb-16">
+			<div class="max-w-7xl mx-auto space-y-6 sm:space-y-7 animate-fade-in pb-16">
 				
-				<!-- Top Breadcrumbs & Back Navigation -->
+				<!-- Top Breadcrumbs & Back Navigation with Sidebar Toggle -->
 				<div class="flex items-center justify-between pb-3 border-b border-[#E0D3C1]">
 					<div class="flex items-center gap-3">
 						<a href="{{ url('/home') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#5C5549] hover:text-[#191917] transition group">
@@ -22,6 +22,15 @@
 						<span class="text-[#D8C9B5]">/</span>
 						<span class="text-xs font-bold text-[#191917]">Wholesale Catalog</span>
 					</div>
+
+					<!-- Direct Sidebar Toggle Button in Header -->
+					<button type="button" onclick="toggleDashboardSidebar()" title="Toggle Sidebar Navigation"
+						class="sidebar-toggle-inline-btn clay-marshmallow-subtle px-3.5 py-1.5 rounded-xl text-3xs font-bold text-[#5C5549] hover:text-[#191917] hover:border-[#191917] transition flex items-center gap-2 cursor-pointer shadow-xs active:scale-95">
+						<svg class="h-3.5 w-3.5 text-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+						</svg>
+						<span class="btn-label">Hide Sidebar</span>
+					</button>
 				</div>
 
 				<!-- Header Title -->
@@ -67,7 +76,7 @@
 				</div>
 
 				<!-- Catalog Products Grid (Clean & Minimal Extruded Clay Tiles) -->
-				<div id="catalog-products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+				<div id="catalog-products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
 					@foreach($catalogProducts as $product)
 						<div class="catalog-card clay-marshmallow clay-marshmallow-hover rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between select-none transition group"
 							data-name="{{ strtolower($product->name) }}"
@@ -92,7 +101,7 @@
 							<!-- Price & Quick Add Action (Single Minimal Bottom Row) -->
 							<div class="mt-3 pt-2.5 border-t border-[#E0D3C1]/50 flex items-center justify-between">
 								<span class="text-sm sm:text-base font-bold text-[#191917] price-text">
-									${{ number_format($product->price, 2) }}
+									₦{{ number_format($product->price, 2) }}
 								</span>
 
 								<button onclick="addProductToCart('{{ $product->id }}', '{{ addslashes($product->name) }}', {{ $product->price }}, '{{ addslashes($product->category) }}', '{{ $product->image }}')"

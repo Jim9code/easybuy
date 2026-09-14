@@ -88,9 +88,15 @@ class SupplierController extends Controller
             ->get();
 
         $orders = $dbOrderItems->map(function($item) {
-            $statusKey = str_replace('_', '-', $item->status);
+            $statusKey = match($item->status) {
+                'packed' => 'dock-pickup',
+                'dispatched' => 'in-transit',
+                'delivered' => 'settled',
+                default => 'awaiting-packing'
+            };
             $statusColor = match($item->status) {
-                'dispatched' => 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                'delivered' => 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                'dispatched' => 'bg-purple-100 text-purple-900 border-purple-300',
                 'packed' => 'bg-blue-100 text-blue-900 border-blue-300',
                 default => 'bg-amber-100 text-amber-900 border-amber-300'
             };
@@ -98,6 +104,8 @@ class SupplierController extends Controller
             return [
                 'id' => $item->order ? $item->order->order_number : ('PO-' . $item->id),
                 'order_item_id' => $item->id,
+                'raw_status' => $item->status,
+                'tracking_number' => $item->tracking_number,
                 'buyer' => $item->order && $item->order->user ? ($item->order->user->company_name ?: $item->order->user->username) : 'Commercial Buyer',
                 'buyer_type' => 'Verified Wholesale Buyer',
                 'item' => $item->product_name,
@@ -139,40 +147,68 @@ class SupplierController extends Controller
                 'tier_2' => $tier2,
                 'tier_3' => $tier3,
                 'lead_time' => $p->lead_time ?: '2-3 Business Days',
+                'warranty' => $p->warranty ?: 'Commercial Quality Guarantee',
                 'min_order_qty' => $p->min_order_qty ?: 1,
                 'status' => $p->stock > 20 ? 'Healthy' : 'Low Stock',
                 'status_color' => $p->stock > 20 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800',
-                'image' => $p->primary_image
+                'image' => $p->primary_image,
+                'images' => $p->gallery_images
             ];
         })->toArray();
 
         // 3. Real Calculated Metrics
         $totalRevenue = (float) OrderItem::where('supplier_id', $userId)
-            ->whereIn('status', ['packed', 'dispatched', 'delivered'])
             ->sum('total_price');
 
-        $inTransitValue = (float) OrderItem::where('supplier_id', $userId)
-            ->where('status', 'dispatched')
+        $settledRevenue = (float) OrderItem::where('supplier_id', $userId)
+            ->where('status', 'delivered')
             ->sum('total_price');
 
-        $nextPayoutAmount = $profile ? (float) $profile->next_payout_amount : 0.00;
+        $settledOrdersCount = OrderItem::where('supplier_id', $userId)
+            ->where('status', 'delivered')
+            ->count();
+
+        $inFulfillmentValue = (float) OrderItem::where('supplier_id', $userId)
+            ->whereIn('status', ['awaiting_packing', 'packed', 'dispatched'])
+            ->sum('total_price');
+
+        $inFulfillmentCount = OrderItem::where('supplier_id', $userId)
+            ->whereIn('status', ['awaiting_packing', 'packed', 'dispatched'])
+            ->count();
+
+        // Calculate next payout amount from settled balance or profile
+        $profilePayoutBalance = $profile ? (float) $profile->next_payout_amount : 0.00;
+        $nextPayoutAmount = $settledRevenue > 0 ? $settledRevenue : $profilePayoutBalance;
 
         $metrics = [
             'total_revenue' => $totalRevenue,
+            'settled_revenue' => $settledRevenue,
+            'settled_orders_count' => $settledOrdersCount,
+            'in_fulfillment_value' => $inFulfillmentValue,
+            'in_fulfillment_count' => $inFulfillmentCount,
             'monthly_growth' => '+0.0%',
-            'active_pos' => count($orders),
-            'in_transit_value' => $inTransitValue,
+            'active_pos' => $inFulfillmentCount > 0 ? $inFulfillmentCount : count($orders),
+            'in_transit_value' => $inFulfillmentValue,
             'open_rfqs' => 0,
             'on_time_rate' => 100.0,
             'tier_status' => $profile ? $profile->tier_level : 'Tier 1 Verified Manufacturer',
             'next_payout_amount' => $nextPayoutAmount,
-            'next_payout_date' => $nextPayoutAmount > 0 ? 'Next Settlement Cycle' : 'No Pending Payouts',
-            'payout_method' => $profile ? ($profile->payout_method ?: 'Bank Transfer (ACH / Paystack)') : 'Bank Transfer'
+            'next_payout_date' => $nextPayoutAmount > 0 ? 'Next Settlement Cycle (Net-15)' : 'No Pending Payouts',
+            'payout_method' => $profile ? ($profile->payout_method ?: 'Bank Transfer (ACH / Paystack)') : 'Bank Transfer (ACH / Paystack)'
         ];
 
-        // 4. Real Zero-Dummy Empty Lists
+        // 4. Dynamic Payout History for Settled Orders
         $rfqs = [];
         $payoutHistory = [];
+        if ($settledRevenue > 0) {
+            $payoutHistory[] = [
+                'ref' => 'REM-' . date('Ymd') . '-' . str_pad($userId, 4, '0', STR_PAD_LEFT),
+                'period' => 'Current Billing Cycle (Net-15)',
+                'orders_count' => $settledOrdersCount,
+                'paid_on' => 'Settlement Ready (Auto-Scheduled)',
+                'amount' => $settledRevenue,
+            ];
+        }
 
         return compact('metrics', 'orders', 'inventory', 'rfqs', 'payoutHistory');
     }

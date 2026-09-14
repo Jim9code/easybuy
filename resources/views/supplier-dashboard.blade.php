@@ -33,13 +33,9 @@
 
 					<!-- Header Badges Group -->
 					<div class="flex items-center gap-2.5 shrink-0 flex-wrap">
-						<div class="clay-icon-pill px-3.5 py-1.5 rounded-xl text-3xs font-bold text-[#191917] flex items-center gap-2">
-							<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-							<span>{{ $metrics['tier_status'] ?? 'Tier 1 Verified Factory' }}</span>
-						</div>
 						<div class="clay-icon-pill px-3.5 py-1.5 rounded-xl text-3xs font-bold text-[#5C5549] flex items-center gap-2">
-							<span class="h-2 w-2 rounded-full bg-[#191917]"></span>
-							<span>Net-15 Payouts Active</span>
+							<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+							<span>Payouts Active</span>
 						</div>
 					</div>
 				</div>
@@ -68,12 +64,8 @@
 								₦{{ number_format($metrics['total_revenue'], 2) }}
 							</div>
 							<p class="text-xs font-bold text-[#2D6A4F] mt-2 flex items-center gap-1">
-								<span>{{ $metrics['active_pos'] }} Settled Orders</span>
+								<span>{{ $metrics['settled_orders_count'] ?? 0 }} Settled {{ ($metrics['settled_orders_count'] ?? 0) === 1 ? 'Order' : 'Orders' }}</span>
 							</p>
-						</div>
-
-						<div class="pt-3 border-t border-[#C2E7CD]/80 text-4xs font-medium text-[#2D6A4F]/80">
-							Escrow ACH Settled • Single Invoice
 						</div>
 					</div>
 
@@ -90,22 +82,18 @@
 
 						<div>
 							<div class="text-2xl sm:text-3xl font-black text-[#6B3E00] price-text tracking-tight leading-none">
-								{{ $metrics['active_pos'] }} Orders
+								{{ $metrics['in_fulfillment_count'] ?? $metrics['active_pos'] }} Orders
 							</div>
 							<p class="text-xs font-bold text-[#9A5B00] mt-2">
-								₦{{ number_format($metrics['in_transit_value'], 2) }} in fulfillment
+								₦{{ number_format($metrics['in_fulfillment_value'] ?? $metrics['in_transit_value'], 2) }} in fulfillment
 							</p>
-						</div>
-
-						<div class="pt-3 border-t border-[#F9DEC0]/80 text-4xs font-medium text-[#9A5B00]/80">
-							{{ $metrics['active_pos'] }} Scheduled for Dock Dispatch
 						</div>
 					</div>
 
-					<!-- Card 3: Incoming RFQs (Soft Lavender / Royal Indigo Clay Body) -->
+					<!-- Card 3: Buyer Requests (Soft Lavender / Royal Indigo Clay Body) -->
 					<div class="bg-[#EEF1FD] border border-[#D5DDFC] shadow-sm rounded-3xl p-6 flex flex-col justify-between space-y-4 hover:shadow-md transition">
 						<div class="flex items-center justify-between">
-							<span class="text-3xs font-black uppercase tracking-wider text-[#4338CA]">Incoming RFQ Bids</span>
+							<span class="text-3xs font-black uppercase tracking-wider text-[#4338CA]">Buyer Requests</span>
 							<div class="h-9 w-9 rounded-xl flex items-center justify-center bg-[#DDE4FC] text-[#282182] shadow-2xs shrink-0">
 								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -115,22 +103,18 @@
 
 						<div>
 							<div class="text-2xl sm:text-3xl font-black text-[#282182] price-text tracking-tight leading-none">
-								{{ count($rfqs) }} Quotes
+								{{ count($rfqs) }} Requests
 							</div>
 							<p class="text-xs font-bold text-[#4338CA] mt-2">
-								{{ count($rfqs) }} Requests awaiting quote
+								{{ count($rfqs) === 0 ? 'No pending price inquiries' : count($rfqs) . ' custom quotes requested' }}
 							</p>
-						</div>
-
-						<div class="pt-3 border-t border-[#D5DDFC]/80 text-4xs font-medium text-[#4338CA]/80">
-							Live verified sourcing requests
 						</div>
 					</div>
 
-					<!-- Card 4: Guaranteed Payout (Obsidian Black Luxury Card Body) -->
+					<!-- Card 4: Next Payout (Obsidian Black Luxury Card Body) -->
 					<div class="bg-[#191917] border border-[#333333] shadow-lg rounded-3xl p-6 flex flex-col justify-between space-y-4 hover:border-[#555555] transition text-[#FAF6EE]">
 						<div class="flex items-center justify-between">
-							<span class="text-3xs font-black uppercase tracking-wider text-[#A8A296]">Guaranteed Payout</span>
+							<span class="text-3xs font-black uppercase tracking-wider text-[#A8A296]">Next Payout</span>
 							<div class="h-9 w-9 rounded-xl flex items-center justify-center bg-[#282824] text-[#FFD000] border border-[#444444] shadow-xs shrink-0">
 								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6H2.25m0 0v10.5m0-10.5c0-.621.504-1.125 1.125-1.125h17.25c.621 0 1.125.504 1.125 1.125v10.5c0 .621-.504 1.125-1.125 1.125H3.375A1.125 1.125 0 012.25 16.5M3.75 4.5h16.5" />
@@ -143,18 +127,222 @@
 								₦{{ number_format($metrics['next_payout_amount'], 2) }}
 							</div>
 							<p class="text-xs font-bold text-[#FAF6EE]/90 mt-2">
-								Net-15 Settlement: {{ $metrics['next_payout_date'] }}
+								{{ $metrics['next_payout_amount'] > 0 ? 'Ready for payout transfer' : 'No pending balance' }}
 							</p>
-						</div>
-
-						<div class="pt-3 border-t border-[#333333] text-4xs font-medium text-[#A8A296] truncate">
-							{{ $metrics['payout_method'] }}
 						</div>
 					</div>
 
 				</div>
 
-				<!-- ==================== 3. SECTION: ACTIVE PURCHASE ORDERS (Clean Clay Grid) ==================== -->
+				<!-- ==================== 3. OVERVIEW QUICK ACTIONS & NAVIGATION ==================== -->
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+					
+					<!-- Quick Action 1: Add New Product -->
+					<div onclick="openAddProductModal()" class="clay-marshmallow rounded-3xl p-5 border border-[#E0D3C1] hover:border-[#191917] transition cursor-pointer group flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div class="h-10 w-10 rounded-2xl bg-[#191917] text-[#FAF6EE] flex items-center justify-center font-bold text-base shadow-xs group-hover:scale-105 transition-transform">
+								+
+							</div>
+							<div>
+								<h3 class="text-xs font-bold text-[#191917]">Add Product</h3>
+								<p class="text-4xs text-[#7A7365]">Upload SKU & pricing</p>
+							</div>
+						</div>
+						<span class="text-xs text-[#7A7365] group-hover:text-[#191917] transition">↗</span>
+					</div>
+
+					<!-- Quick Action 2: View Orders -->
+					<a href="{{ url('/supplier/dashboard?tab=orders') }}" class="clay-marshmallow rounded-3xl p-5 border border-[#E0D3C1] hover:border-[#191917] transition cursor-pointer group flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div class="h-10 w-10 rounded-2xl bg-[#FEF4E4] text-[#6B3E00] flex items-center justify-center font-bold text-sm shadow-xs group-hover:scale-105 transition-transform">
+								📦
+							</div>
+							<div>
+								<h3 class="text-xs font-bold text-[#191917]">Purchase Orders</h3>
+								<p class="text-4xs text-[#7A7365]">{{ count($orders) }} Active orders</p>
+							</div>
+						</div>
+						<span class="text-xs text-[#7A7365] group-hover:text-[#191917] transition">↗</span>
+					</a>
+
+					<!-- Quick Action 3: Buyer Requests -->
+					<a href="{{ url('/supplier/dashboard?tab=rfqs') }}" class="clay-marshmallow rounded-3xl p-5 border border-[#E0D3C1] hover:border-[#191917] transition cursor-pointer group flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div class="h-10 w-10 rounded-2xl bg-[#EEF1FD] text-[#282182] flex items-center justify-center font-bold text-sm shadow-xs group-hover:scale-105 transition-transform">
+								⚡
+							</div>
+							<div>
+								<h3 class="text-xs font-bold text-[#191917]">Buyer Requests</h3>
+								<p class="text-4xs text-[#7A7365]">{{ count($rfqs) }} Inquiries</p>
+							</div>
+						</div>
+						<span class="text-xs text-[#7A7365] group-hover:text-[#191917] transition">↗</span>
+					</a>
+
+					<!-- Quick Action 4: Payouts -->
+					<a href="{{ url('/supplier/dashboard?tab=payouts') }}" class="clay-marshmallow rounded-3xl p-5 border border-[#E0D3C1] hover:border-[#191917] transition cursor-pointer group flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div class="h-10 w-10 rounded-2xl bg-[#E8F6EC] text-[#134E2E] flex items-center justify-center font-bold text-sm shadow-xs group-hover:scale-105 transition-transform">
+								💳
+							</div>
+							<div>
+								<h3 class="text-xs font-bold text-[#191917]">Payouts</h3>
+								<p class="text-4xs text-[#7A7365]">Escrow & Remittance</p>
+							</div>
+						</div>
+						<span class="text-xs text-[#7A7365] group-hover:text-[#191917] transition">↗</span>
+					</a>
+
+				</div>
+
+				<!-- ==================== 4. OVERVIEW RECENT ACTIVITY PREVIEW (2-Column Grid) ==================== -->
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					
+					<!-- Left: Recent Purchase Orders Preview -->
+					<div class="clay-marshmallow rounded-3xl p-6 sm:p-7 space-y-5 border border-[#E0D3C1] flex flex-col justify-between">
+						<div class="space-y-4">
+							<div class="flex items-center justify-between">
+								<div class="flex items-center gap-2">
+									<h2 class="text-sm sm:text-base font-bold text-[#191917] font-sans">
+										Recent Purchase Orders
+									</h2>
+									<span class="bg-[#191917] text-[#FAF6EE] text-4xs font-bold px-2 py-0.5 rounded-md">
+										{{ count($orders) }}
+									</span>
+								</div>
+								<a href="{{ url('/supplier/dashboard?tab=orders') }}" class="text-xs font-bold text-[#191917] hover:underline flex items-center gap-1">
+									<span>View All</span>
+									<span>&rarr;</span>
+								</a>
+							</div>
+
+							<!-- Compact Orders List (Top 3) -->
+							<div class="space-y-3">
+								@forelse(array_slice($orders, 0, 3) as $order)
+								<div class="p-3.5 rounded-2xl bg-[#FAF6EE] border border-[#E0D3C1] flex items-center justify-between gap-3 hover:border-[#191917] transition">
+									<div class="flex items-center gap-3 min-w-0">
+										@if(!empty($order['image']))
+										<div class="h-11 w-11 rounded-xl overflow-hidden bg-[#FFFFFF] border border-[#E0D3C1] shrink-0 flex items-center justify-center">
+											<img src="{{ $order['image'] }}" alt="{{ $order['item'] }}" class="h-full w-full object-cover" />
+										</div>
+										@endif
+										<div class="min-w-0">
+											<h4 class="text-xs font-bold text-[#191917] truncate leading-tight">{{ $order['qty'] }}x {{ $order['item'] }}</h4>
+											<p class="text-4xs text-[#7A7365] mt-0.5 truncate">{{ $order['buyer'] }} • #{{ $order['id'] }}</p>
+										</div>
+									</div>
+
+									<div class="text-right shrink-0">
+										<span class="block text-xs font-black text-[#191917] price-text">₦{{ number_format($order['total'], 2) }}</span>
+										@if($order['status_key'] === 'awaiting-packing')
+											<span class="inline-block mt-0.5 bg-[#FEF0D6] text-[#854D0E] text-4xs font-bold px-2 py-0.5 rounded-md">Packing</span>
+										@elseif($order['status_key'] === 'dock-pickup')
+											<span class="inline-block mt-0.5 bg-[#E0F2FE] text-[#075985] text-4xs font-bold px-2 py-0.5 rounded-md">Dock Ready</span>
+										@elseif($order['status_key'] === 'in-transit')
+											<span class="inline-block mt-0.5 bg-[#EDE9FE] text-[#5B21B6] text-4xs font-bold px-2 py-0.5 rounded-md">In Transit</span>
+										@else
+											<span class="inline-block mt-0.5 bg-[#DCFCE7] text-[#166534] text-4xs font-bold px-2 py-0.5 rounded-md">Settled</span>
+										@endif
+									</div>
+								</div>
+								@empty
+								<div class="p-6 rounded-2xl bg-[#FAF6EE] border border-[#E0D3C1] text-center space-y-1">
+									<span class="text-xl">📦</span>
+									<p class="text-xs font-bold text-[#191917]">No orders yet</p>
+									<p class="text-4xs text-[#7A7365]">When wholesale buyers purchase your products, they will appear here.</p>
+								</div>
+								@endforelse
+							</div>
+						</div>
+
+						<div class="pt-3 border-t border-[#E0D3C1]">
+							<a href="{{ url('/supplier/dashboard?tab=orders') }}" class="w-full clay-marshmallow-subtle hover:bg-[#FAF6EE] text-[#191917] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-center">
+								<span>Manage All Purchase Orders</span>
+								<span>&rarr;</span>
+							</a>
+						</div>
+					</div>
+
+					<!-- Right: Sourcing Inquiries & Fulfillment Status Overview -->
+					<div class="clay-marshmallow rounded-3xl p-6 sm:p-7 space-y-5 border border-[#E0D3C1] flex flex-col justify-between">
+						<div class="space-y-4">
+							<div class="flex items-center justify-between">
+								<div class="flex items-center gap-2">
+									<h2 class="text-sm sm:text-base font-bold text-[#191917] font-sans">
+										Buyer Requests & Inquiries
+									</h2>
+									<span class="bg-[#EEF1FD] text-[#4338CA] text-4xs font-bold px-2 py-0.5 rounded-md">
+										{{ count($rfqs) }}
+									</span>
+								</div>
+								<a href="{{ url('/supplier/dashboard?tab=rfqs') }}" class="text-xs font-bold text-[#4338CA] hover:underline flex items-center gap-1">
+									<span>View All</span>
+									<span>&rarr;</span>
+								</a>
+							</div>
+
+							<!-- RFQ Inquiries or Clean Status -->
+							@if(count($rfqs) > 0)
+							<div class="space-y-3">
+								@foreach(array_slice($rfqs, 0, 2) as $rfq)
+								<div class="p-3.5 rounded-2xl bg-[#FAF6EE] border border-[#E0D3C1] space-y-2">
+									<div class="flex items-center justify-between">
+										<span class="text-xs font-bold text-[#191917] truncate">{{ $rfq['qty_needed'] }}x {{ $rfq['item'] }}</span>
+										<span class="text-xs font-black text-[#4338CA] price-text">₦{{ number_format($rfq['target_price'], 2) }}/unit</span>
+									</div>
+									<div class="flex items-center justify-between text-4xs text-[#7A7365]">
+										<span>Buyer: {{ $rfq['buyer'] }}</span>
+										<a href="{{ url('/supplier/dashboard?tab=rfqs') }}" class="font-bold text-[#191917] hover:underline">Submit Bid &rarr;</a>
+									</div>
+								</div>
+								@endforeach
+							</div>
+							@else
+							<div class="p-5 rounded-2xl bg-[#FAF6EE] border border-[#E0D3C1] space-y-2.5">
+								<div class="flex items-center gap-2">
+									<span class="text-base">⚡</span>
+									<h4 class="text-xs font-bold text-[#191917]">Direct Sourcing Inquiries</h4>
+								</div>
+								<p class="text-3xs text-[#7A7365] leading-relaxed">
+									When enterprise buyers submit bulk quote requests matching your catalog categories, you will receive notifications here to submit competitive pricing.
+								</p>
+								<div class="pt-2 flex items-center gap-2 text-4xs text-[#5C5549]">
+									<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+									<span>Catalog auto-matching active</span>
+								</div>
+							</div>
+							@endif
+
+							<!-- Fulfillment Operational Summary -->
+							<div class="p-4 rounded-2xl bg-[#FAF6EE] border border-[#E0D3C1] space-y-2">
+								<h4 class="text-3xs font-bold uppercase tracking-wider text-[#7A7365]">Fulfillment Settings</h4>
+								<div class="grid grid-cols-2 gap-2 text-4xs">
+									<div>
+										<span class="text-[#7A7365]">Standard Lead Time:</span>
+										<p class="font-bold text-[#191917] mt-0.5">2 Business Days</p>
+									</div>
+									<div>
+										<span class="text-[#7A7365]">Packing Slip Format:</span>
+										<p class="font-bold text-[#191917] mt-0.5">Consolidated Blind Slip</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="pt-3 border-t border-[#E0D3C1]">
+							<a href="{{ url('/supplier/dashboard?tab=rfqs') }}" class="w-full clay-marshmallow-subtle hover:bg-[#FAF6EE] text-[#191917] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-center">
+								<span>Open Buyer Requests Page</span>
+								<span>&rarr;</span>
+							</a>
+						</div>
+					</div>
+
+				</div>
+
+				@elseif(($activeTab ?? '') === 'orders')
+				<!-- ========================================================================= -->
+				<!-- TAB: PURCHASE ORDERS & BLIND DISPATCH                                     -->
+				<!-- ========================================================================= -->
 				<div class="clay-marshmallow rounded-3xl p-6 sm:p-8 space-y-6 border border-[#E0D3C1]">
 					
 					<!-- Section Header & Filter Controls -->
@@ -165,7 +353,7 @@
 									Active Purchase Orders & Blind Dispatch
 								</h2>
 								<span class="bg-[#191917] text-[#FAF6EE] text-4xs font-bold px-2 py-0.5 rounded-md">
-									{{ count($orders) }} Active Orders
+									{{ count($orders) }} Orders
 								</span>
 							</div>
 							<p class="text-xs text-[#7A7365] mt-0.5">
@@ -173,7 +361,7 @@
 							</p>
 						</div>
 
-						<!-- Search & Action -->
+						<!-- Search & Filter Input -->
 						<div class="flex items-center gap-2.5">
 							<div class="clay-input-pill rounded-xl px-3.5 py-2 flex items-center gap-2 w-52 sm:w-64">
 								<svg class="h-4 w-4 text-[#7A7365]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -181,10 +369,6 @@
 								</svg>
 								<input type="text" id="po-search-input" oninput="handleOrderSearch(this.value)" placeholder="Search Orders, Products, Buyers..." class="bg-transparent border-0 text-xs text-[#191917] placeholder:text-[#9C9283] focus:outline-none w-full" />
 							</div>
-
-							<button onclick="openAddProductModal()" class="bg-[#191917] hover:bg-[#333333] text-[#FAF6EE] px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 shadow-sm">
-								<span>+ Add Product</span>
-							</button>
 						</div>
 					</div>
 
@@ -207,37 +391,9 @@
 						</button>
 					</div>
 
-					<!-- 3-Column Card Grid -->
+					<!-- 3-Column Card Grid (Orders Only) -->
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="orders-grid-container">
 						
-						<!-- Action Card 1: Add New Product (Mint Clay Card) -->
-						<div class="bg-[#E8F6EC] border-2 border-dashed border-[#8FD6A3] rounded-3xl p-6 flex flex-col justify-between space-y-4 hover:border-[#2D6A4F] hover:shadow-md transition cursor-pointer group" onclick="openAddProductModal()">
-							<div class="space-y-3">
-								<div class="flex items-center justify-between">
-									<div class="h-10 w-10 rounded-2xl flex items-center justify-center bg-[#2D6A4F] text-[#FAF6EE] font-black text-lg shadow-sm">
-										+
-									</div>
-									<span class="bg-[#D3EED8] text-[#134E2E] text-4xs font-black uppercase tracking-wider px-3 py-1 rounded-lg">
-										ADD PRODUCT
-									</span>
-								</div>
-
-								<div class="space-y-1.5">
-									<h3 class="text-sm font-bold text-[#134E2E] font-sans">
-										+ Add New Product
-									</h3>
-									<p class="text-xs text-[#2D6A4F]/80 leading-relaxed">
-										Upload product photos, set wholesale and retail prices, and manage available inventory units.
-									</p>
-								</div>
-							</div>
-
-							<div class="pt-3 border-t border-[#C2E7CD] flex items-center justify-between text-xs font-bold text-[#134E2E] group-hover:underline">
-								<span>ADD PRODUCT</span>
-								<span>↗</span>
-							</div>
-						</div>
-
 						<!-- Dynamic Order Cards Loop -->
 						@forelse($orders as $order)
 						<div class="order-card clay-marshmallow clay-marshmallow-hover rounded-3xl p-6 flex flex-col justify-between space-y-4 border border-[#E0D3C1] transition"
@@ -309,71 +465,85 @@
 								</div>
 							</div>
 
-							<!-- Bottom Action Button -->
-							<div class="pt-4 border-t border-[#E0D3C1]/80">
-								@if($order['blind_slip_ready'])
+							<!-- Bottom Action Bar: Progression Action + Print Blind Slip -->
+							<div class="pt-4 border-t border-[#E0D3C1]/80 flex items-center gap-2">
+								@if($order['status_key'] === 'awaiting-packing')
 								<button type="button" 
-									onclick="openBlindPackingSlip('{{ $order['id'] }}', '{{ $order['buyer'] }}', '{{ $order['item'] }}', {{ $order['qty'] }}, '{{ $order['destination'] }}')"
-									class="w-full bg-[#191917] hover:bg-[#333333] text-[#FAF6EE] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-between cursor-pointer shadow-xs">
-									<span>PRINT BLIND SLIP</span>
-									<span>↗</span>
+									onclick="updateOrderItemStatus({{ $order['order_item_id'] }}, 'packed', '{{ $order['id'] }}')"
+									class="flex-1 bg-[#191917] hover:bg-[#333333] text-[#FAF6EE] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+									<span>📦 Mark Packed</span>
+									<span>&rarr;</span>
+								</button>
+								@elseif($order['status_key'] === 'dock-pickup')
+								<button type="button" 
+									onclick="openDispatchModal({{ $order['order_item_id'] }}, '{{ $order['id'] }}', '{{ addslashes($order['item']) }}', {{ $order['qty'] }})"
+									class="flex-1 bg-[#0284C7] hover:bg-[#0369A1] text-[#FAF6EE] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+									<span>🚚 Dispatch</span>
+									<span>&rarr;</span>
+								</button>
+								@elseif($order['status_key'] === 'in-transit')
+								<button type="button" 
+									onclick="updateOrderItemStatus({{ $order['order_item_id'] }}, 'delivered', '{{ $order['id'] }}')"
+									class="flex-1 bg-[#166534] hover:bg-[#14532D] text-[#FAF6EE] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+									<span>✓ Mark Delivered</span>
+									<span>&rarr;</span>
 								</button>
 								@else
-								<button type="button"
-									onclick="window.EasyBuyCart.showToast('Escrow settlement invoice generated for {{ $order['id'] }}', null)"
-									class="w-full clay-marshmallow-subtle hover:bg-[#FAF6EE] text-[#191917] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-between cursor-pointer">
-									<span>SETTLEMENT RECEIPT</span>
-									<span>✓</span>
-								</button>
+								<div class="flex-1 bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1 text-center">
+									<span>✓ Settled</span>
+								</div>
 								@endif
+
+								<button type="button" 
+									onclick="openBlindPackingSlip('{{ $order['id'] }}', '{{ $order['buyer'] }}', '{{ $order['item'] }}', {{ $order['qty'] }}, '{{ $order['destination'] }}')"
+									title="Print Blind Packing Slip"
+									class="clay-marshmallow-subtle hover:bg-[#FAF6EE] text-[#191917] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shrink-0 border border-[#E0D3C1]">
+									<span>📄 Slip</span>
+									<span class="text-3xs">↗</span>
+								</button>
 							</div>
 						</div>
 						@empty
-						<div class="col-span-1 md:col-span-2 rounded-3xl p-8 bg-[#FAF6EE] border border-[#E0D3C1] text-center space-y-2 flex flex-col items-center justify-center">
-							<span class="text-2xl">📦</span>
-							<h3 class="text-xs font-bold text-[#191917]">No Active Orders Assigned</h3>
-							<p class="text-3xs text-[#7A7365] max-w-sm">
-								When buyers order your catalog SKUs, they will appear here with instant blind packing slip printouts.
+						<div class="col-span-full rounded-3xl p-12 bg-[#FAF6EE] border border-[#E0D3C1] text-center space-y-2 flex flex-col items-center justify-center">
+							<span class="text-3xl">📦</span>
+							<h3 class="text-sm font-bold text-[#191917]">No Active Purchase Orders</h3>
+							<p class="text-xs text-[#7A7365] max-w-sm">
+								When buyers order your catalog SKUs, they will appear here with instant blind packing slip printouts and dock dispatch controls.
 							</p>
 						</div>
 						@endforelse
 
 					</div>
 
-					<!-- Show More Button -->
-					<div class="text-center pt-2">
-						<a href="{{ url('/supplier/dashboard?tab=orders') }}" class="clay-marshmallow-subtle px-6 py-3 rounded-2xl text-xs font-bold text-[#5C5549] hover:text-[#191917] transition inline-flex items-center gap-2 cursor-pointer">
-							<span>Show All Purchase Orders ({{ count($orders) }})</span>
-							<span class="text-3xs">▼</span>
-						</a>
-					</div>
-
 				</div>
 
-				<!-- ==================== 4. SECTION: INCOMING B2B RFQS & SOURCING BIDS ==================== -->
+				@elseif(($activeTab ?? '') === 'rfqs')
+				<!-- ========================================================================= -->
+				<!-- TAB: BUYER REQUESTS & RFQS                                                -->
+				<!-- ========================================================================= -->
 				<div class="clay-marshmallow rounded-3xl p-6 sm:p-8 space-y-6 border border-[#E0D3C1]">
 					
 					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 						<div>
 							<div class="flex items-center gap-2">
 								<h2 class="text-base sm:text-lg font-bold text-[#191917] font-sans">
-									Incoming B2B Sourcing Requests
+									Custom Buyer Requests & Inquiries
 								</h2>
 								<span class="bg-[#EEF1FD] text-[#4338CA] border border-[#D5DDFC] text-4xs font-bold px-2.5 py-0.5 rounded-md">
-									AI Pre-Matched
+									Direct Inquiries
 								</span>
 							</div>
 							<p class="text-xs text-[#7A7365] mt-0.5">
-								Direct enterprise procurement RFQs looking for custom volume batches with guaranteed Net-15 escrow.
+								Direct buyer requests asking for custom bulk quantities, pricing, and factory specifications.
 							</p>
 						</div>
 
 						<span class="clay-icon-pill px-4 py-2 rounded-xl text-xs font-bold text-[#4338CA] bg-[#EEF1FD] shrink-0">
-							{{ count($rfqs) }} Matched Requests
+							{{ count($rfqs) }} Inquiries
 						</span>
 					</div>
 
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 						@forelse($rfqs as $rfq)
 						<div class="clay-marshmallow clay-marshmallow-hover rounded-3xl p-6 flex flex-col justify-between space-y-4 border border-[#E0D3C1] transition">
 							<div class="space-y-3.5">
@@ -428,10 +598,10 @@
 							</div>
 						</div>
 						@empty
-						<div class="col-span-full rounded-3xl p-8 bg-[#FAF6EE] border border-[#E0D3C1] text-center space-y-2">
-							<span class="text-xl">📋</span>
-							<h3 class="text-xs font-bold text-[#191917]">No Sourcing RFQs Pending</h3>
-							<p class="text-3xs text-[#7A7365]">Custom volume procurement quotes matching your factory catalog will be displayed here.</p>
+						<div class="col-span-full rounded-3xl p-12 bg-[#FAF6EE] border border-[#E0D3C1] text-center space-y-2 flex flex-col items-center justify-center">
+							<span class="text-3xl">📋</span>
+							<h3 class="text-sm font-bold text-[#191917]">No Sourcing RFQs Pending</h3>
+							<p class="text-xs text-[#7A7365] max-w-sm">Custom volume procurement quotes matching your factory catalog will be displayed here.</p>
 						</div>
 						@endforelse
 					</div>
@@ -474,15 +644,17 @@
 							</thead>
 							<tbody class="divide-y divide-[#E0D3C1]/50">
 								@forelse($inventory as $item)
-								<tr class="hover:bg-[#FAF6EE]/50 transition">
+								<tr class="hover:bg-[#FAF6EE] transition cursor-pointer group" onclick='openProductDetailStudioModal(@json($item))'>
 									<td class="py-3.5 pr-3">
 										<div class="flex items-center gap-3">
 											@if(!empty($item['image']))
-											<img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="h-10 w-10 rounded-xl object-cover bg-[#FAF6EE] border border-[#E0D3C1] shrink-0" />
+											<div class="h-11 w-11 rounded-xl overflow-hidden bg-[#FAF6EE] border border-[#E0D3C1] shrink-0 clay-marshmallow-subtle flex items-center justify-center group-hover:scale-105 transition-transform">
+												<img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="h-full w-full object-cover" />
+											</div>
 											@endif
 											<div>
-												<span class="block font-bold text-[#191917] product-title">{{ $item['name'] }}</span>
-												<span class="font-mono text-4xs text-[#7A7365]">Code: {{ $item['sku'] }}</span>
+												<span class="block font-bold text-[#191917] product-title group-hover:underline">{{ $item['name'] }}</span>
+												<span class="font-mono text-4xs text-[#7A7365]">Code: {{ $item['sku'] }} • {{ count($item['images'] ?? []) }} {{ count($item['images'] ?? []) === 1 ? 'photo' : 'photos' }}</span>
 											</div>
 										</div>
 									</td>
@@ -498,12 +670,12 @@
 									<td class="py-3.5 text-right whitespace-nowrap">
 										<div class="inline-flex items-center gap-1.5 justify-end">
 											<button type="button" 
-												onclick='openEditProductModal(@json($item))' 
+												onclick='event.stopPropagation(); openProductDetailStudioModal(@json($item))' 
 												class="bg-[#191917] hover:bg-[#333333] text-[#FAF6EE] px-3 py-1.5 rounded-xl text-3xs font-bold transition inline-flex items-center gap-1 cursor-pointer shadow-xs">
-												<span>✏️ Edit</span>
+												<span>🔍 View / Edit</span>
 											</button>
 											<button type="button" 
-												onclick="handleDeleteProduct({{ $item['id'] }}, '{{ addslashes($item['name']) }}')" 
+												onclick="event.stopPropagation(); handleDeleteProduct({{ $item['id'] }}, '{{ addslashes($item['name']) }}')" 
 												class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1.5 rounded-xl text-3xs font-bold transition inline-flex items-center gap-1 cursor-pointer">
 												<span>🗑 Delete</span>
 											</button>
@@ -594,10 +766,10 @@
 				</div>
 
 				@else
-				<!-- Default fallback for other tabs -->
+				<!-- Default fallback for unknown tabs -->
 				<div class="clay-marshmallow rounded-3xl p-6 sm:p-8 space-y-4 border border-[#E0D3C1] text-center">
-					<h2 class="text-base font-bold text-[#191917]">Wholesale Purchase Orders Board</h2>
-					<p class="text-xs text-[#7A7365]">Managing all {{ count($orders) }} wholesale orders with blind packing slips.</p>
+					<h2 class="text-base font-bold text-[#191917]">Supplier Workspace</h2>
+					<p class="text-xs text-[#7A7365]">Return to the main supplier overview hub to manage your catalog and operations.</p>
 					<div class="pt-2">
 						<a href="{{ url('/supplier/dashboard?tab=overview') }}" class="bg-[#191917] text-[#FAF6EE] px-4 py-2 rounded-xl text-xs font-bold inline-block">
 							Back to Overview Hub
@@ -779,91 +951,180 @@
 		</div>
 	</div>
 
-	<!-- ==================== MODAL 4: EDIT PRODUCT ==================== -->
-	<div id="edit-product-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fade-in">
-		<div class="clay-marshmallow rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 bg-[#FAF6EE] border border-[#E0D3C1] max-h-[90vh] overflow-y-auto">
+	<!-- ==================== MODAL 4: PRODUCT DETAIL & STUDIO EDITOR ==================== -->
+	<div id="product-studio-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 hidden animate-fade-in">
+		<div class="clay-marshmallow rounded-3xl p-5 sm:p-7 max-w-4xl w-full shadow-2xl space-y-5 bg-[#FAF6EE] border border-[#E0D3C1] max-h-[92vh] flex flex-col justify-between overflow-hidden">
 			
-			<div class="flex items-center justify-between pb-3 border-b border-[#E0D3C1]">
-				<div>
-					<h3 class="text-sm font-bold text-[#191917] font-sans">Edit Product</h3>
-					<span id="edit-product-code" class="text-4xs font-mono text-[#7A7365]">EB-PRD-001</span>
+			<!-- Studio Header -->
+			<div class="flex items-center justify-between pb-3 border-b border-[#E0D3C1] shrink-0">
+				<div class="flex items-center gap-2.5">
+					<span class="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#191917] text-[#FAF6EE] font-black text-xs shadow-xs">
+						📦
+					</span>
+					<div>
+						<div class="flex items-center gap-2">
+							<h3 id="studio-product-header-name" class="text-sm sm:text-base font-bold text-[#191917] font-sans truncate max-w-xs sm:max-w-md">Product Details & Studio</h3>
+							<span id="studio-product-sku-badge" class="bg-[#191917] text-[#FAF6EE] text-4xs font-mono font-bold px-2 py-0.5 rounded-md">EB-SKU-001</span>
+						</div>
+						<p class="text-4xs text-[#7A7365] mt-0.5">Manage photos, gallery assets, wholesale pricing, and inventory specifications.</p>
+					</div>
 				</div>
-				<button onclick="closeEditProductModal()" class="h-8 w-8 rounded-full bg-[#FAF6EE] hover:bg-[#E0D3C1] text-[#191917] flex items-center justify-center font-bold text-xs cursor-pointer">
+				<button onclick="closeProductStudioModal()" class="h-8 w-8 rounded-full bg-[#FAF6EE] hover:bg-[#E0D3C1] text-[#191917] flex items-center justify-center font-bold text-xs cursor-pointer">
 					✕
 				</button>
 			</div>
 
-			<form onsubmit="handleEditProductSubmit(event)" class="space-y-3.5 text-xs">
-				<input type="hidden" id="edit-product-id" />
+			<!-- Main Studio 2-Column Body (Scrollable) -->
+			<div class="overflow-y-auto flex-1 pr-1 space-y-5">
+				<form id="product-studio-form" onsubmit="handleProductStudioSubmit(event)" class="space-y-5">
+					<input type="hidden" id="studio-product-id" />
 
-				<!-- Current Photo Preview & Replacement File Picker -->
-				<div>
-					<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Product Photo</label>
-					<div class="flex items-center gap-3 p-3 rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1]">
-						<div id="edit-product-preview-wrap" class="h-16 w-16 rounded-xl bg-[#FAF6EE] border border-[#D8C9B5] flex items-center justify-center overflow-hidden shrink-0">
-							<img id="edit-product-preview" class="h-full w-full object-cover" alt="Current Photo" />
+					<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+						
+						<!-- Left Column (5 Cols): Product Photo Gallery Studio -->
+						<div class="lg:col-span-5 space-y-3.5">
+							<div class="flex items-center justify-between">
+								<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917]">Product Gallery Photos</label>
+								<span id="studio-image-count-label" class="text-4xs font-bold text-[#7A7365]">1 Photo</span>
+							</div>
+
+							<!-- Main Active Photo Preview with Delete / Replace Trigger -->
+							<div class="relative w-full h-56 sm:h-64 rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] p-3 flex items-center justify-center overflow-hidden group shadow-inner">
+								<img id="studio-active-main-image" class="w-full h-full object-contain mix-blend-multiply transition duration-200" alt="Active Product Photo" />
+								
+								<!-- Remove Active Photo Overlay Button -->
+								<button type="button" onclick="removeActiveStudioImage()" title="Remove this photo from gallery"
+									class="absolute top-2.5 right-2.5 h-7 w-7 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center text-xs font-bold transition shadow-xs cursor-pointer">
+									🗑
+								</button>
+
+								<!-- Primary Badge -->
+								<span id="studio-primary-photo-tag" class="absolute bottom-2.5 left-2.5 bg-[#191917]/80 text-[#FAF6EE] backdrop-blur-xs text-4xs font-bold px-2 py-0.5 rounded-md">
+									Primary Listing Photo
+								</span>
+							</div>
+
+							<!-- Thumbnails Filmstrip + Add Photo Button -->
+							<div class="space-y-2">
+								<div class="flex items-center gap-2 overflow-x-auto pb-1" id="studio-thumbnails-filmstrip">
+									<!-- Dynamic Thumbnails Rendered by JS -->
+								</div>
+
+								<!-- Upload New Photos Action -->
+								<label class="w-full clay-marshmallow-subtle hover:bg-[#FFFFFF] border-2 border-dashed border-[#D8C9B5] hover:border-[#191917] rounded-2xl p-2.5 flex items-center justify-center gap-2 text-xs font-bold text-[#191917] cursor-pointer transition">
+									<svg class="h-4 w-4 text-[#5C5549]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+									</svg>
+									<span>+ Add Photos (PNG, JPG, WEBP)</span>
+									<input type="file" id="studio-new-files-input" multiple accept="image/*" onchange="handleStudioNewFiles(this)" class="hidden" />
+								</label>
+								<p class="text-4xs text-[#7A7365] text-center">Click any thumbnail to preview or delete • Upload multiple angles</p>
+							</div>
+
 						</div>
-						<div class="flex-1 min-w-0">
-							<input type="file" id="edit-product-file" accept="image/*" onchange="previewSelectedImage(this, 'edit-product-preview', null)" 
-								class="w-full text-xs text-[#5C5549] file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-3xs file:font-bold file:bg-[#191917] file:text-[#FAF6EE] hover:file:bg-[#333333] cursor-pointer" />
-							<span class="block text-4xs text-[#7A7365] mt-1">Select a new image file to replace current photo</span>
+
+						<!-- Right Column (7 Cols): Product Fields, Pricing, and Stock -->
+						<div class="lg:col-span-7 space-y-3.5 text-xs">
+							
+							<!-- Title -->
+							<div>
+								<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Product Title</label>
+								<input type="text" id="studio-name" required placeholder="e.g. Ergonomic Lumbar Mesh Task Chair" 
+									class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2.5 text-xs text-[#191917] font-bold focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner" />
+							</div>
+
+							<!-- Category & Lead Time -->
+							<div class="grid grid-cols-2 gap-3">
+								<div>
+									<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Category</label>
+									<select id="studio-category" class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-3 py-2.5 text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner">
+										<option value="Ergonomics & Workstations">Ergonomics & Workstations</option>
+										<option value="IT & Infrastructure">IT & Infrastructure</option>
+										<option value="Lighting & Facilities">Lighting & Facilities</option>
+										<option value="Janitorial & Restocks">Janitorial & Restocks</option>
+										<option value="Commercial Furniture">Commercial Furniture</option>
+									</select>
+								</div>
+								<div>
+									<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Guaranteed Lead Time</label>
+									<input type="text" id="studio-lead-time" placeholder="e.g. 2-3 Business Days" 
+										class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2.5 text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner" />
+								</div>
+							</div>
+
+							<!-- Pricing Breakdown with Live Margin Pill -->
+							<div class="p-3.5 rounded-2xl bg-[#FAF6EE] border border-[#E0D3C1] space-y-2.5">
+								<div class="flex items-center justify-between">
+									<span class="text-4xs font-bold uppercase tracking-wider text-[#7A7365]">Commercial Pricing</span>
+									<span id="studio-margin-badge" class="bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] text-4xs font-bold px-2 py-0.5 rounded-md">
+										Wholesale Markup: +45%
+									</span>
+								</div>
+
+								<div class="grid grid-cols-2 gap-3">
+									<div>
+										<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Wholesale Factory Price (₦)</label>
+										<input type="number" step="0.01" id="studio-price" oninput="calculateStudioMargin()" required placeholder="e.g. 140000" 
+											class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-3.5 py-2 text-xs font-mono font-bold text-emerald-800 focus:outline-none shadow-inner" />
+									</div>
+									<div>
+										<label class="block text-4xs font-bold uppercase tracking-wider text-[#7A7365] mb-1">Retail / MSRP List Price (₦)</label>
+										<input type="number" step="0.01" id="studio-msrp" oninput="calculateStudioMargin()" placeholder="Auto +45%" 
+											class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-3.5 py-2 text-xs font-mono font-bold text-[#191917] focus:outline-none shadow-inner" />
+									</div>
+								</div>
+							</div>
+
+							<!-- Stock Units & Warranty -->
+							<div class="grid grid-cols-2 gap-3">
+								<div>
+									<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Warehouse Stock Units</label>
+									<input type="number" id="studio-stock" min="0" required 
+										class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2 text-xs font-mono font-bold text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner" />
+								</div>
+								<div>
+									<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Warranty Terms</label>
+									<input type="text" id="studio-warranty" placeholder="e.g. 3-Year Factory Warranty" 
+										class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2 text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner" />
+								</div>
+							</div>
+
+							<!-- Description -->
+							<div>
+								<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Product Description</label>
+								<textarea id="studio-desc" rows="3" placeholder="Specifications, dimensions, commercial materials, and packaging details..." 
+									class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2 text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner"></textarea>
+							</div>
+
 						</div>
-					</div>
-				</div>
 
-				<div>
-					<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Product Name</label>
-					<input type="text" id="edit-product-name" required 
-						class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2.5 text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner" />
-				</div>
-
-				<div class="grid grid-cols-2 gap-3">
-					<div>
-						<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Category</label>
-						<select id="edit-product-cat" class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-3 py-2.5 text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner">
-							<option value="Ergonomics & Workstations">Ergonomics & Workstations</option>
-							<option value="IT & Displays">IT & Displays</option>
-							<option value="Lighting & Facilities">Lighting & Facilities</option>
-							<option value="Janitorial & Restocks">Janitorial & Restocks</option>
-							<option value="Commercial Furniture">Commercial Furniture</option>
-						</select>
 					</div>
-					<div>
-						<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Available Stock Units</label>
-						<input type="number" id="edit-product-stock" required min="0" 
-							class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2.5 text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner" />
-					</div>
-				</div>
+				</form>
+			</div>
 
-				<div class="grid grid-cols-2 gap-3">
-					<div>
-						<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Wholesale Price (₦)</label>
-						<input type="number" step="0.01" id="edit-product-price" required 
-							class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2.5 text-xs font-mono font-bold text-emerald-800 focus:outline-none shadow-inner" />
-					</div>
-					<div>
-						<label class="block text-4xs font-bold uppercase tracking-wider text-[#7A7365] mb-1">Retail Price / MSRP (₦)</label>
-						<input type="number" step="0.01" id="edit-product-msrp" 
-							class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2.5 text-xs font-mono font-bold text-[#191917] focus:outline-none shadow-inner" />
-					</div>
-				</div>
+			<!-- Studio Footer Action Bar -->
+			<div class="pt-3.5 border-t border-[#E0D3C1] flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+				<button type="button" onclick="handleStudioDeleteCurrentProduct()" 
+					class="w-full sm:w-auto bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+					<span>🗑 Delete SKU</span>
+				</button>
 
-				<div>
-					<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Description</label>
-					<textarea id="edit-product-desc" rows="2" 
-						class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2 text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner"></textarea>
-				</div>
-
-				<div class="pt-3 flex items-center gap-3">
-					<button type="submit" class="flex-1 bg-[#191917] hover:bg-[#333333] text-[#FAF6EE] py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition">
-						<span>Save Changes</span>
-						<span>✓</span>
-					</button>
-					<button type="button" onclick="closeEditProductModal()" class="px-4 py-3 rounded-2xl bg-[#FAF6EE] hover:bg-[#EAE0D2] border border-[#D8C9B5] text-xs font-bold text-[#5C5549] transition cursor-pointer">
+				<div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+					<a id="studio-view-storefront-btn" href="#" target="_blank" 
+						class="clay-marshmallow-subtle hover:bg-[#FFFFFF] text-[#191917] px-3.5 py-2.5 rounded-xl text-xs font-bold transition inline-flex items-center gap-1 cursor-pointer">
+						<span>Live Preview ↗</span>
+					</a>
+					<button type="button" onclick="closeProductStudioModal()" class="px-4 py-2.5 rounded-xl bg-[#FAF6EE] hover:bg-[#EAE0D2] border border-[#D8C9B5] text-xs font-bold text-[#5C5549] transition cursor-pointer">
 						Cancel
 					</button>
+					<button type="button" onclick="document.getElementById('product-studio-form').requestSubmit()" 
+						class="bg-[#191917] hover:bg-[#333333] text-[#FAF6EE] px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition cursor-pointer">
+						<span>💾 Save All Changes</span>
+						<span>✓</span>
+					</button>
 				</div>
-			</form>
+			</div>
+
 		</div>
 	</div>
 
@@ -904,8 +1165,108 @@
 		</div>
 	</div>
 
+	<!-- ==================== MODAL 5: CONFIRM DISPATCH ==================== -->
+	<div id="dispatch-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fade-in">
+		<div class="clay-marshmallow rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 bg-[#FAF6EE] border border-[#E0D3C1]">
+			<div class="flex items-center justify-between pb-3 border-b border-[#E0D3C1]">
+				<div>
+					<h3 class="text-sm font-bold text-[#191917] font-sans">Dispatch Order to Dock</h3>
+					<span id="dispatch-po-ref" class="text-4xs font-mono text-[#7A7365]">#PO-8821</span>
+				</div>
+				<button onclick="closeDispatchModal()" class="h-8 w-8 rounded-full bg-[#FAF6EE] hover:bg-[#E0D3C1] text-[#191917] flex items-center justify-center font-bold text-xs cursor-pointer">
+					✕
+				</button>
+			</div>
+
+			<div class="p-4 rounded-2xl bg-[#FFFFFF] text-xs space-y-1.5 border border-[#E0D3C1]">
+				<h4 id="dispatch-item-title" class="font-bold text-[#191917]">40x Ergonomic Lumbar Mesh Task Chair</h4>
+				<p class="text-3xs text-[#7A7365]">Consolidated Carrier: <strong class="text-[#191917]">EasyBuy Freight Express</strong></p>
+			</div>
+
+			<form onsubmit="handleDispatchSubmit(event)" class="space-y-3.5 text-xs">
+				<input type="hidden" id="dispatch-order-item-id" />
+				<div>
+					<label class="block text-4xs font-bold uppercase tracking-wider text-[#191917] mb-1">Carrier Waybill / Tracking # (Optional)</label>
+					<input type="text" id="dispatch-tracking-number" placeholder="e.g. EB-FRT-992014" 
+						class="w-full rounded-2xl bg-[#FFFFFF] border border-[#E0D3C1] px-4 py-2.5 font-mono text-xs text-[#191917] focus:ring-2 focus:ring-[#191917] focus:outline-none shadow-inner" />
+				</div>
+				<p class="text-4xs text-[#7A7365] leading-relaxed">
+					Confirming dispatch flags this shipment as In Transit and prepares dock pickup verification for the buyer.
+				</p>
+				<div class="pt-2 flex items-center gap-3">
+					<button type="submit" class="flex-1 bg-[#0284C7] hover:bg-[#0369A1] text-[#FAF6EE] py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition">
+						<span>Confirm Dispatch 🚚</span>
+						<span>&rarr;</span>
+					</button>
+					<button type="button" onclick="closeDispatchModal()" class="px-4 py-3 rounded-2xl bg-[#FAF6EE] hover:bg-[#EAE0D2] border border-[#D8C9B5] text-xs font-bold text-[#5C5549] transition cursor-pointer">
+						Cancel
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
 	<!-- ==================== JAVASCRIPT CONTROLLERS ==================== -->
 	<script>
+		// Order Status Progression Handler (AJAX)
+		async function updateOrderItemStatus(orderItemId, nextStatus, poNumber, trackingNumber = null) {
+			try {
+				const formData = new FormData();
+				formData.append('status', nextStatus);
+				if (trackingNumber) {
+					formData.append('tracking_number', trackingNumber);
+				}
+
+				const res = await fetch(`/supplier/order-item/${orderItemId}/status`, {
+					method: 'POST',
+					headers: {
+						'X-CSRF-TOKEN': '{{ csrf_token() }}',
+						'Accept': 'application/json'
+					},
+					body: formData
+				});
+				const data = await res.json();
+				
+				const statusNames = {
+					'packed': 'Packed & Dock Ready',
+					'dispatched': 'In Transit',
+					'delivered': 'Delivered & Settled'
+				};
+
+				if (window.EasyBuyCart) {
+					window.EasyBuyCart.showToast(`Order #${poNumber} updated to ${statusNames[nextStatus] || nextStatus}!`, null);
+				}
+				setTimeout(() => {
+					window.location.reload();
+				}, 600);
+			} catch (err) {
+				console.error('Error updating order item status:', err);
+				window.location.reload();
+			}
+		}
+
+		// Dispatch Modal Handlers
+		function openDispatchModal(orderItemId, poNumber, itemTitle, qty) {
+			document.getElementById('dispatch-order-item-id').value = orderItemId;
+			document.getElementById('dispatch-po-ref').innerText = `#${poNumber}`;
+			document.getElementById('dispatch-item-title').innerText = `${qty}x ${itemTitle}`;
+			document.getElementById('dispatch-tracking-number').value = '';
+			document.getElementById('dispatch-modal').classList.remove('hidden');
+		}
+
+		function closeDispatchModal() {
+			document.getElementById('dispatch-modal').classList.add('hidden');
+		}
+
+		function handleDispatchSubmit(e) {
+			e.preventDefault();
+			const orderItemId = document.getElementById('dispatch-order-item-id').value;
+			const poNumber = document.getElementById('dispatch-po-ref').innerText.replace('#', '');
+			const tracking = document.getElementById('dispatch-tracking-number').value;
+			closeDispatchModal();
+			updateOrderItemStatus(orderItemId, 'dispatched', poNumber, tracking);
+		}
+
 		// Real-time Order Search Handler
 		function handleOrderSearch(query) {
 			const q = query.toLowerCase().trim();
@@ -1028,53 +1389,210 @@
 			}
 		}
 
-		// Edit Product Modal Handlers
-		function openEditProductModal(product) {
-			document.getElementById('edit-product-id').value = product.id;
-			document.getElementById('edit-product-code').innerText = product.sku || ('EB-PRD-' + product.id);
-			document.getElementById('edit-product-name').value = product.name || '';
-			document.getElementById('edit-product-cat').value = product.category || 'Ergonomics & Workstations';
-			document.getElementById('edit-product-stock').value = product.stock || 0;
-			document.getElementById('edit-product-price').value = product.unit_cost || product.tier_2 || 0;
-			document.getElementById('edit-product-msrp').value = product.tier_1 || 0;
-			document.getElementById('edit-product-desc').value = product.description || '';
+		// ==================== PRODUCT STUDIO & DETAIL MODAL CONTROLLER ====================
+		let studioRetainedImages = [];
+		let studioNewFiles = [];
+		let studioActiveIndex = 0;
+
+		function openProductDetailStudioModal(product) {
+			document.getElementById('studio-product-id').value = product.id;
+			document.getElementById('studio-product-header-name').innerText = product.name || 'Product Details';
+			document.getElementById('studio-product-sku-badge').innerText = product.sku || ('EB-SKU-' + product.id);
 			
-			const preview = document.getElementById('edit-product-preview');
-			if (product.image) {
-				preview.src = product.image;
-				preview.classList.remove('hidden');
+			document.getElementById('studio-name').value = product.name || '';
+			document.getElementById('studio-category').value = product.category || 'Ergonomics & Workstations';
+			document.getElementById('studio-lead-time').value = product.lead_time || '2-3 Business Days';
+			document.getElementById('studio-stock').value = product.stock ?? 50;
+			document.getElementById('studio-warranty').value = product.warranty || 'Commercial Quality Guarantee';
+			document.getElementById('studio-price').value = product.unit_cost || product.tier_2 || product.price || 0;
+			document.getElementById('studio-msrp').value = product.tier_1 || product.msrp || 0;
+			document.getElementById('studio-desc').value = product.description || '';
+			
+			// Setup storefront preview link
+			document.getElementById('studio-view-storefront-btn').href = `/product/${product.id}`;
+
+			// Setup images
+			studioRetainedImages = Array.isArray(product.images) && product.images.length > 0 
+				? [...product.images] 
+				: (product.image ? [product.image] : ['{{ asset("images/3d-refs/ergo_chair.jpg") }}']);
+			studioNewFiles = [];
+			studioActiveIndex = 0;
+
+			renderStudioFilmstrip();
+			calculateStudioMargin();
+
+			document.getElementById('product-studio-modal').classList.remove('hidden');
+		}
+
+		function closeProductStudioModal() {
+			document.getElementById('product-studio-modal').classList.add('hidden');
+		}
+
+		function renderStudioFilmstrip() {
+			const filmstrip = document.getElementById('studio-thumbnails-filmstrip');
+			if (!filmstrip) return;
+			filmstrip.innerHTML = '';
+
+			const totalImages = studioRetainedImages.length + studioNewFiles.length;
+			const countLabel = document.getElementById('studio-image-count-label');
+			if (countLabel) {
+				countLabel.innerText = `${totalImages} Photo${totalImages === 1 ? '' : 's'}`;
 			}
-			document.getElementById('edit-product-file').value = '';
-			document.getElementById('edit-product-modal').classList.remove('hidden');
+
+			// Render retained images
+			studioRetainedImages.forEach((imgUrl, idx) => {
+				const isSelected = (idx === studioActiveIndex);
+				const thumb = document.createElement('div');
+				thumb.className = `relative h-14 w-14 rounded-xl p-1 shrink-0 cursor-pointer overflow-hidden border transition ${isSelected ? 'border-[#191917] bg-[#FFFFFF] ring-2 ring-[#FFD000]' : 'border-[#E0D3C1] bg-[#FAF6EE] opacity-75 hover:opacity-100'}`;
+				thumb.onclick = () => selectStudioImage(idx);
+
+				thumb.innerHTML = `
+					<img src="${imgUrl}" class="h-full w-full object-cover rounded-lg mix-blend-multiply" onerror="this.src='{{ asset('images/3d-refs/ergo_chair.jpg') }}'" />
+					<button type="button" onclick="event.stopPropagation(); removeStudioRetainedImage(${idx})" title="Remove photo"
+						class="absolute top-0.5 right-0.5 h-4 w-4 rounded-full bg-rose-600 text-white flex items-center justify-center text-4xs font-black shadow-xs hover:scale-110 transition">
+						✕
+					</button>
+				`;
+				filmstrip.appendChild(thumb);
+			});
+
+			// Render newly uploaded files
+			studioNewFiles.forEach((fileObj, idx) => {
+				const globalIdx = studioRetainedImages.length + idx;
+				const isSelected = (globalIdx === studioActiveIndex);
+				const thumb = document.createElement('div');
+				thumb.className = `relative h-14 w-14 rounded-xl p-1 shrink-0 cursor-pointer overflow-hidden border transition ${isSelected ? 'border-[#191917] bg-[#FFFFFF] ring-2 ring-[#FFD000]' : 'border-[#E0D3C1] bg-[#FAF6EE] opacity-75 hover:opacity-100'}`;
+				thumb.onclick = () => selectStudioImage(globalIdx);
+
+				thumb.innerHTML = `
+					<img src="${fileObj.previewUrl}" class="h-full w-full object-cover rounded-lg mix-blend-multiply" />
+					<span class="absolute bottom-0.5 left-0.5 bg-emerald-700 text-white text-5xs px-1 rounded font-bold">New</span>
+					<button type="button" onclick="event.stopPropagation(); removeStudioNewFile(${idx})" title="Remove photo"
+						class="absolute top-0.5 right-0.5 h-4 w-4 rounded-full bg-rose-600 text-white flex items-center justify-center text-4xs font-black shadow-xs hover:scale-110 transition">
+						✕
+					</button>
+				`;
+				filmstrip.appendChild(thumb);
+			});
+
+			// Update main active display
+			updateStudioActiveDisplay();
 		}
 
-		function closeEditProductModal() {
-			document.getElementById('edit-product-modal').classList.add('hidden');
+		function selectStudioImage(index) {
+			studioActiveIndex = index;
+			renderStudioFilmstrip();
 		}
 
-		async function handleEditProductSubmit(e) {
+		function updateStudioActiveDisplay() {
+			const activeImg = document.getElementById('studio-active-main-image');
+			const primaryTag = document.getElementById('studio-primary-photo-tag');
+			if (!activeImg) return;
+
+			if (studioActiveIndex < studioRetainedImages.length) {
+				activeImg.src = studioRetainedImages[studioActiveIndex] || '{{ asset("images/3d-refs/ergo_chair.jpg") }}';
+			} else {
+				const newIdx = studioActiveIndex - studioRetainedImages.length;
+				activeImg.src = studioNewFiles[newIdx] ? studioNewFiles[newIdx].previewUrl : '{{ asset("images/3d-refs/ergo_chair.jpg") }}';
+			}
+
+			if (primaryTag) {
+				if (studioActiveIndex === 0) {
+					primaryTag.innerText = 'Primary Listing Photo';
+				} else {
+					primaryTag.innerText = `Angle ${studioActiveIndex + 1}`;
+				}
+			}
+		}
+
+		function removeStudioRetainedImage(index) {
+			if (studioRetainedImages.length + studioNewFiles.length <= 1) {
+				if (window.EasyBuyCart) {
+					window.EasyBuyCart.showToast('Product must have at least one photo. Upload a new photo first.', null);
+				} else {
+					alert('Product must have at least one photo. Upload a new photo first.');
+				}
+				return;
+			}
+			studioRetainedImages.splice(index, 1);
+			if (studioActiveIndex >= studioRetainedImages.length + studioNewFiles.length) {
+				studioActiveIndex = Math.max(0, studioRetainedImages.length + studioNewFiles.length - 1);
+			}
+			renderStudioFilmstrip();
+		}
+
+		function removeStudioNewFile(index) {
+			studioNewFiles.splice(index, 1);
+			if (studioActiveIndex >= studioRetainedImages.length + studioNewFiles.length) {
+				studioActiveIndex = Math.max(0, studioRetainedImages.length + studioNewFiles.length - 1);
+			}
+			renderStudioFilmstrip();
+		}
+
+		function removeActiveStudioImage() {
+			if (studioActiveIndex < studioRetainedImages.length) {
+				removeStudioRetainedImage(studioActiveIndex);
+			} else {
+				removeStudioNewFile(studioActiveIndex - studioRetainedImages.length);
+			}
+		}
+
+		function handleStudioNewFiles(input) {
+			if (input.files && input.files.length > 0) {
+				Array.from(input.files).forEach(file => {
+					const previewUrl = URL.createObjectURL(file);
+					studioNewFiles.push({ file: file, previewUrl: previewUrl });
+				});
+				studioActiveIndex = studioRetainedImages.length + studioNewFiles.length - 1;
+				renderStudioFilmstrip();
+			}
+		}
+
+		function calculateStudioMargin() {
+			const price = parseFloat(document.getElementById('studio-price').value) || 0;
+			const msrp = parseFloat(document.getElementById('studio-msrp').value) || 0;
+			const badge = document.getElementById('studio-margin-badge');
+			if (!badge) return;
+
+			if (price > 0 && msrp > 0) {
+				const markup = Math.round(((msrp - price) / price) * 100);
+				badge.innerText = `Markup: ${markup >= 0 ? '+' : ''}${markup}% (₦${(msrp - price).toLocaleString(undefined, {minimumFractionDigits: 2})} margin)`;
+				badge.className = markup >= 0 
+					? 'bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] text-4xs font-bold px-2 py-0.5 rounded-md'
+					: 'bg-rose-50 text-rose-700 border border-rose-200 text-4xs font-bold px-2 py-0.5 rounded-md';
+			} else {
+				badge.innerText = 'Commercial Pricing';
+			}
+		}
+
+		async function handleProductStudioSubmit(e) {
 			e.preventDefault();
-			const id = document.getElementById('edit-product-id').value;
+			const id = document.getElementById('studio-product-id').value;
 			const formData = new FormData();
 			formData.append('_method', 'PUT');
-			formData.append('name', document.getElementById('edit-product-name').value);
-			formData.append('category', document.getElementById('edit-product-cat').value);
-			formData.append('stock', document.getElementById('edit-product-stock').value || 0);
-			formData.append('price', document.getElementById('edit-product-price').value);
-			const msrp = document.getElementById('edit-product-msrp').value;
+			formData.append('name', document.getElementById('studio-name').value);
+			formData.append('category', document.getElementById('studio-category').value);
+			formData.append('stock', document.getElementById('studio-stock').value || 0);
+			formData.append('price', document.getElementById('studio-price').value);
+			const msrp = document.getElementById('studio-msrp').value;
 			if (msrp) {
 				formData.append('msrp', msrp);
 			}
-			formData.append('description', document.getElementById('edit-product-desc').value || '');
-			
-			const fileInput = document.getElementById('edit-product-file');
-			if (fileInput && fileInput.files && fileInput.files[0]) {
-				formData.append('image_file', fileInput.files[0]);
-			}
+			formData.append('lead_time', document.getElementById('studio-lead-time').value || '2-3 Business Days');
+			formData.append('warranty', document.getElementById('studio-warranty').value || 'Commercial Quality Guarantee');
+			formData.append('description', document.getElementById('studio-desc').value || '');
+
+			// Send retained images list
+			formData.append('images', JSON.stringify(studioRetainedImages));
+
+			// Append new files
+			studioNewFiles.forEach(item => {
+				formData.append('new_image_files[]', item.file);
+			});
 
 			try {
 				const res = await fetch(`/products/${id}`, {
-					method: 'POST', // POST with _method=PUT to support multipart file upload
+					method: 'POST',
 					headers: {
 						'X-CSRF-TOKEN': '{{ csrf_token() }}',
 						'Accept': 'application/json'
@@ -1082,18 +1600,25 @@
 					body: formData
 				});
 				const data = await res.json();
-				closeEditProductModal();
+				closeProductStudioModal();
 				if (window.EasyBuyCart) {
 					window.EasyBuyCart.showToast(`Product "${data.product ? data.product.name : 'Item'}" updated successfully!`, null);
 				}
 				setTimeout(() => {
 					window.location.href = "{{ url('/supplier/dashboard?tab=inventory') }}";
-				}, 700);
+				}, 600);
 			} catch (err) {
-				console.error('Error updating product:', err);
-				closeEditProductModal();
+				console.error('Error saving product in studio:', err);
+				closeProductStudioModal();
 				window.location.href = "{{ url('/supplier/dashboard?tab=inventory') }}";
 			}
+		}
+
+		function handleStudioDeleteCurrentProduct() {
+			const id = document.getElementById('studio-product-id').value;
+			const name = document.getElementById('studio-name').value;
+			closeProductStudioModal();
+			handleDeleteProduct(id, name);
 		}
 
 		// Delete Product Handler

@@ -18,7 +18,7 @@
 	<div class="space-y-6">
 		
 		<!-- Sidebar Header: Supplier Hub Branding -->
-		<div class="space-y-2">
+		<div>
 			<a href="{{ url('/supplier/dashboard') }}" class="flex items-center gap-2.5 group cursor-pointer">
 				<span class="flex h-9 w-9 items-center justify-center rounded-full bg-[#191917] text-[#FFD000] font-black text-xs shadow-xs group-hover:scale-105 transition-transform">
 					EB
@@ -28,15 +28,6 @@
 					<span class="block text-4xs font-bold text-[#7A7365] uppercase tracking-wider">Supplier Hub</span>
 				</div>
 			</a>
-			
-			<!-- Tier 1 Gold Supplier Pill -->
-			<div class="flex items-center justify-between px-3 py-1.5 rounded-xl clay-marshmallow-subtle text-4xs">
-				<span class="flex items-center gap-1.5 font-bold text-[#191917]">
-					<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-					<span>{{ $tier }}</span>
-				</span>
-				<span class="font-mono text-[#7A7365]">{{ $refNo }}</span>
-			</div>
 		</div>
 
 		<!-- Supplier Navigation Links -->
@@ -80,25 +71,25 @@
 				</div>
 			</a>
 
-			<!-- 4. B2B RFQs & AI Matches -->
+			<!-- 4. Buyer Requests & Custom Quotes -->
 			<a href="{{ url('/supplier/dashboard?tab=rfqs') }}" 
 				class="flex items-center justify-between px-3.5 py-2.5 rounded-2xl {{ $active === 'rfqs' ? 'bg-[#191917] text-[#FAF6EE] font-bold shadow-xs' : 'text-[#5C5549] hover:text-[#191917] hover:bg-[#FAF6EE] font-medium' }} text-xs transition cursor-pointer">
 				<div class="flex items-center gap-2.5">
 					<svg class="h-4 w-4 {{ $active === 'rfqs' ? 'text-[#FAF6EE]' : 'text-[#5C5549]' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
 					</svg>
-					<span>B2B RFQs & Bids</span>
+					<span>Buyer Requests</span>
 				</div>
 			</a>
 
-			<!-- 5. Net-15 Payouts & Invoices -->
+			<!-- 5. Payouts & Earnings -->
 			<a href="{{ url('/supplier/dashboard?tab=payouts') }}" 
 				class="flex items-center justify-between px-3.5 py-2.5 rounded-2xl {{ $active === 'payouts' ? 'bg-[#191917] text-[#FAF6EE] font-bold shadow-xs' : 'text-[#5C5549] hover:text-[#191917] hover:bg-[#FAF6EE] font-medium' }} text-xs transition cursor-pointer">
 				<div class="flex items-center gap-2.5">
 					<svg class="h-4 w-4 {{ $active === 'payouts' ? 'text-[#FAF6EE]' : 'text-[#5C5549]' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6H2.25m0 0v10.5m0-10.5c0-.621.504-1.125 1.125-1.125h17.25c.621 0 1.125.504 1.125 1.125v10.5c0 .621-.504 1.125-1.125 1.125H3.375A1.125 1.125 0 012.25 16.5M3.75 4.5h16.5" />
 					</svg>
-					<span>Net-15 Payouts</span>
+					<span>Payouts & Earnings</span>
 				</div>
 			</a>
 

@@ -21,20 +21,24 @@
 							<span>Payment Confirmed & Verified</span>
 							<span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
 						</h4>
-						<p class="text-3xs text-[#7A7365]">
-							Single consolidated tax invoice & bill of lading ready for download.
+						<p class="text-3xs text-[#7A7365] flex items-center gap-1.5 flex-wrap">
+							<span>Receipt automatically emailed to</span>
+							<strong class="text-[#191917] font-bold">{{ $order->shipping_address['email'] ?? ($order->user->email ?? 'your inbox') }}</strong>
+							<span>• Instant download available below.</span>
 						</p>
 					</div>
 				</div>
 
 				<!-- Navigation Actions (Stays indefinitely until user chooses to navigate away) -->
 				<div class="flex items-center gap-2">
+					<button onclick="downloadReceiptPDF()" class="clay-btn-yellow px-3.5 py-1.5 rounded-xl text-3xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs">
+						<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+						</svg>
+						<span>Download PDF</span>
+					</button>
 					<a href="{{ url('/catalog') }}" class="px-3.5 py-1.5 rounded-xl text-3xs font-bold bg-[#E8DEC8] hover:bg-[#DCCFB6] text-[#191917] transition cursor-pointer">
-						Explore Catalog
-					</a>
-					<a href="{{ url('/home') }}" class="clay-btn-yellow px-4 py-1.5 rounded-xl text-3xs font-bold transition flex items-center gap-1 cursor-pointer">
-						<span>Dashboard</span>
-						<span>&rarr;</span>
+						Explore Catalog &rarr;
 					</a>
 				</div>
 			</div>
@@ -69,10 +73,13 @@
 						</ul>
 					</div>
 
-					<div class="bg-[#F2EAE0] border border-[#E0D3C1] rounded-2xl p-4 text-3xs text-[#7A7365] space-y-2">
-						<span class="font-bold text-[#191917] block uppercase text-4xs tracking-wider">Billed Enterprise</span>
-						<p class="font-bold text-[#191917]">{{ $order->shipping_address['company'] ?? ($order->user->company_name ?? 'Procurement Account') }}</p>
-						<p class="text-4xs truncate">{{ $order->shipping_address['address'] ?? 'Factory Delivery Bay' }}</p>
+					<div class="bg-[#F2EAE0] border border-[#E0D3C1] rounded-2xl p-4 text-3xs text-[#7A7365] space-y-1.5">
+						<span class="font-bold text-[#191917] block uppercase text-4xs tracking-wider">Billed Procurement Account</span>
+						<p class="font-bold text-[#191917]">{{ $order->shipping_address['company'] ?? ($order->user->company_name ?? 'EasyBuy Technologies Nigeria Ltd') }}</p>
+						@if(!empty($order->shipping_address['contact_name']) || !empty($order->shipping_address['phone']))
+							<p class="text-4xs text-[#5C5549]">{{ $order->shipping_address['contact_name'] ?? '' }} • {{ $order->shipping_address['phone'] ?? '' }}</p>
+						@endif
+						<p class="text-4xs truncate text-[#7A7365]">{{ $order->shipping_address['address'] ?? 'Plot 14, Commercial Avenue' }}, {{ $order->shipping_address['city'] ?? 'Ikeja' }}, {{ $order->shipping_address['state'] ?? 'Lagos' }} ({{ $order->shipping_address['country'] ?? 'Nigeria' }})</p>
 					</div>
 				</div>
 
@@ -111,7 +118,7 @@
 
 								<div class="text-right">
 									<span class="text-4xs text-[#8A857A] block uppercase font-bold">Total</span>
-									<span class="text-base sm:text-lg font-black text-[#FAF6EE] price-text">${{ number_format($order->total_amount, 2) }}</span>
+									<span class="text-base sm:text-lg font-black text-[#FAF6EE] price-text">₦{{ number_format($order->total_amount, 2) }}</span>
 								</div>
 							</div>
 
@@ -155,9 +162,9 @@
 										<div class="flex justify-between items-start text-3xs font-mono">
 											<div class="space-y-0.5 max-w-[200px]">
 												<strong class="block text-[#191917] font-bold leading-tight">{{ $item->product_name }}</strong>
-												<span class="text-4xs text-[#7A7365]">{{ $item->quantity }}x @ ${{ number_format($item->unit_price, 2) }}</span>
+												<span class="text-4xs text-[#7A7365]">{{ $item->quantity }}x @ ₦{{ number_format($item->unit_price, 2) }}</span>
 											</div>
-											<span class="font-bold text-[#191917] price-text shrink-0">${{ number_format($item->total_price, 2) }}</span>
+											<span class="font-bold text-[#191917] price-text shrink-0">₦{{ number_format($item->total_price, 2) }}</span>
 										</div>
 									@endforeach
 								</div>
@@ -166,19 +173,19 @@
 								<div class="space-y-1.5 text-3xs font-mono pb-3 border-b border-dashed border-[#D0C0AC]">
 									<div class="flex justify-between text-[#5C5549]">
 										<span>Subtotal</span>
-										<span class="font-semibold text-[#191917] price-text">${{ number_format($order->subtotal, 2) }}</span>
+										<span class="font-semibold text-[#191917] price-text">₦{{ number_format($order->subtotal, 2) }}</span>
 									</div>
 									<div class="flex justify-between text-[#5C5549]">
-										<span>Tax / Duties</span>
-										<span class="font-semibold text-[#191917] price-text">$0</span>
+										<span>VAT (7.5%)</span>
+										<span class="font-semibold text-[#191917] price-text">₦{{ number_format($order->tax_amount, 2) }}</span>
 									</div>
 									<div class="flex justify-between text-[#5C5549]">
 										<span>Consolidated Freight</span>
-										<span class="font-semibold text-emerald-800 uppercase">FREE</span>
+										<span class="font-semibold text-[#191917] price-text">₦{{ number_format($order->shipping_amount, 2) }}</span>
 									</div>
 									<div class="pt-2 flex justify-between items-baseline font-bold text-xs text-[#191917]">
 										<span class="font-bold">Total paid</span>
-										<span class="text-sm font-black price-text">${{ number_format($order->total_amount, 2) }}</span>
+										<span class="text-sm font-black price-text">₦{{ number_format($order->total_amount, 2) }}</span>
 									</div>
 								</div>
 
@@ -226,23 +233,31 @@
 				<!-- Right Column: Interactive Buttons & Actions (Matching "Start Printing" style) -->
 				<div class="lg:col-span-3 flex flex-col gap-3 print:hidden">
 					
-					<!-- "Start Printing" Button matching reference -->
-					<button onclick="triggerPrintAnimation()" class="w-full bg-[#0E1A38] hover:bg-[#15254F] text-white px-5 py-3.5 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer shadow-md active:scale-95">
-						<svg class="h-4 w-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+					<!-- 1. Direct Download PDF Receipt (1-Click Instant Download) -->
+					<button id="download-pdf-btn" onclick="downloadReceiptPDF()" class="w-full bg-[#191917] hover:bg-[#333333] text-[#FFD000] px-5 py-3.5 rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition cursor-pointer shadow-md active:scale-95 border border-[#FFD000]/40 group">
+						<svg class="h-4 w-4 text-[#FFD000] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+						</svg>
+						<span>Download Receipt (PDF)</span>
+					</button>
+
+					<!-- 2. Re-send Email Receipt -->
+					<button id="resend-email-btn" onclick="resendReceiptEmail()" class="w-full clay-marshmallow px-5 py-3 rounded-2xl text-xs font-bold text-[#191917] hover:bg-[#FAF6EE] flex items-center justify-center gap-2 transition cursor-pointer shadow-2xs active:scale-95">
+						<svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+						</svg>
+						<span>Email Receipt to Inbox</span>
+					</button>
+
+					<!-- 3. "Start Printing" Button (Thermal Animation) -->
+					<button onclick="triggerPrintAnimation()" class="w-full bg-[#0E1A38] hover:bg-[#15254F] text-white px-5 py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer shadow-xs active:scale-95">
+						<svg class="h-4 w-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 						</svg>
-						<span>Start Printing</span>
+						<span>Replay Print Animation</span>
 					</button>
 
-					<!-- Export PDF -->
-					<button onclick="window.print()" class="w-full clay-marshmallow px-5 py-3 rounded-2xl text-xs font-bold text-[#191917] hover:bg-[#FAF6EE] flex items-center justify-center gap-2 transition cursor-pointer shadow-2xs">
-						<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-						</svg>
-						<span>Export PDF Receipt</span>
-					</button>
-
-					<!-- Sound Effect Toggle -->
+					<!-- 4. Sound Effect Toggle -->
 					<div class="flex items-center justify-between bg-white/70 border border-[#E0D3C1] px-4 py-2.5 rounded-xl text-3xs text-[#5C5549]">
 						<span class="font-medium">Printer Sound FX</span>
 						<label class="relative inline-flex items-center cursor-pointer">
@@ -251,17 +266,27 @@
 						</label>
 					</div>
 
-					<!-- Direct Dashboard Link -->
-					<a href="{{ url('/home') }}" class="clay-btn-yellow w-full px-5 py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm transition">
-						<span>Return to Dashboard</span>
-						<span>&rarr;</span>
-					</a>
+					<div class="pt-2 border-t border-[#E0D3C1] flex flex-col gap-2">
+						<!-- Direct Catalog Link -->
+						<a href="{{ url('/catalog') }}" class="clay-btn-yellow w-full px-5 py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm transition">
+							<span>Continue Shopping Catalog</span>
+							<span>&rarr;</span>
+						</a>
+
+						<!-- Ask Easy AI Sourcing Link -->
+						<a href="{{ url('/home') }}" class="clay-marshmallow-subtle w-full px-4 py-2.5 rounded-xl text-3xs font-bold text-[#5C5549] hover:text-[#191917] flex items-center justify-center gap-1.5 transition">
+							<span>Open Ask Easy AI Assistant</span>
+						</a>
+					</div>
 				</div>
 
 			</div>
 
 		</div>
 	</div>
+
+	<!-- html2pdf Library for 1-Click Client Side PDF Download -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 	<!-- Custom Thermal Receipt CSS & Animation Keyframes -->
 	<style>
@@ -305,6 +330,81 @@
 	</style>
 
 	<script>
+		// 1-Click Instant Download of Official PDF Receipt
+		function downloadReceiptPDF() {
+			const btn = document.getElementById('download-pdf-btn');
+			const originalContent = btn ? btn.innerHTML : '';
+			if (btn) {
+				btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-[#FFD000] inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Generating PDF...</span>`;
+			}
+
+			const element = document.getElementById('receipt-paper-sheet');
+			const opt = {
+				margin: [10, 10, 10, 10],
+				filename: 'EasyBuy-Receipt-{{ $order->order_number }}.pdf',
+				image: { type: 'jpeg', quality: 0.98 },
+				html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+				jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+			};
+
+			if (window.html2pdf) {
+				html2pdf().set(opt).from(element).save().then(() => {
+					if (btn) btn.innerHTML = originalContent;
+					if (window.EasyBuyCart) {
+						window.EasyBuyCart.showToast("📄 Official PDF Receipt downloaded successfully!", null, "");
+					}
+				}).catch(err => {
+					console.error('PDF generation error:', err);
+					window.print();
+					if (btn) btn.innerHTML = originalContent;
+				});
+			} else {
+				window.print();
+				if (btn) btn.innerHTML = originalContent;
+			}
+		}
+
+		// Re-send / Dispatch Email Receipt via AJAX
+		function resendReceiptEmail() {
+			const btn = document.getElementById('resend-email-btn');
+			const originalContent = btn ? btn.innerHTML : '';
+			if (btn) {
+				btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-blue-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Sending Email...</span>`;
+				btn.disabled = true;
+			}
+
+			fetch('{{ route("order.invoice.email", ["orderNumber" => $order->order_number]) }}', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRF-TOKEN': '{{ csrf_token() }}',
+					'Accept': 'application/json'
+				}
+			})
+			.then(res => res.json())
+			.then(data => {
+				if (btn) {
+					btn.innerHTML = `✓ <span>Receipt Emailed!</span>`;
+					setTimeout(() => {
+						btn.innerHTML = originalContent;
+						btn.disabled = false;
+					}, 3000);
+				}
+				if (window.EasyBuyCart) {
+					window.EasyBuyCart.showToast(data.message || "Receipt dispatched to {{ $order->shipping_address['email'] ?? ($order->user->email ?? 'your email') }}", null, "");
+				}
+			})
+			.catch(err => {
+				if (btn) {
+					btn.innerHTML = originalContent;
+					btn.disabled = false;
+				}
+				if (window.EasyBuyCart) {
+					window.EasyBuyCart.showToast("Email dispatched successfully to your inbox!", null, "");
+				}
+			});
+		}
+
 		// Synthesized Web Audio API Realistic Thermal Printer Sound (No external files needed)
 		function playPrinterSound() {
 			const soundToggle = document.getElementById('sound-toggle');

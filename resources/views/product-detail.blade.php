@@ -3,20 +3,20 @@
 	<div class="h-[calc(100vh-4rem)] flex flex-col lg:flex-row bg-[#FAF6EE] overflow-hidden">
 		
 		<!-- ==================== FIXED DASHBOARD SIDEBAR ==================== -->
-		<x-dashboard-sidebar active="home" />
+		<x-dashboard-sidebar active="catalog" />
 
 		<!-- ==================== CENTER PRODUCT DETAIL CANVAS ==================== -->
-		<main class="flex-1 h-full overflow-y-auto p-4 sm:p-8 lg:p-12 relative">
+		<main class="flex-1 h-full overflow-y-auto p-4 sm:p-8 lg:p-12 pb-28 lg:pb-12 relative">
 			
 			<div class="max-w-5xl mx-auto space-y-6 animate-fade-in">
 				
 				<!-- Top Breadcrumbs & Back Navigation -->
 				<div class="flex items-center justify-between pb-2 border-b border-[#E0D3C1]/50">
-					<a href="{{ url('/home') }}" class="clay-marshmallow-subtle hover:bg-[#FAF6EE] px-3.5 py-1.5 rounded-xl inline-flex items-center gap-2 text-3xs font-bold text-[#5C5549] hover:text-[#191917] transition cursor-pointer group">
+					<a href="{{ url('/catalog') }}" class="clay-marshmallow-subtle hover:bg-[#FAF6EE] px-3.5 py-1.5 rounded-xl inline-flex items-center gap-2 text-3xs font-bold text-[#5C5549] hover:text-[#191917] transition cursor-pointer group">
 						<svg class="h-3.5 w-3.5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
 						</svg>
-						<span>Back to Ask Easy</span>
+						<span>Back to Catalog</span>
 					</a>
 					<div class="flex items-center gap-2">
 						<span class="clay-icon-pill px-3 py-1 rounded-xl text-4xs font-bold uppercase tracking-wider text-[#191917]">
@@ -25,6 +25,13 @@
 						<span class="clay-marshmallow-subtle px-2.5 py-1 rounded-xl text-4xs font-mono text-[#7A7365]">
 							{{ $product->sku }}
 						</span>
+						<button type="button" onclick="toggleDashboardSidebar()" title="Toggle Sidebar Navigation"
+							class="sidebar-toggle-inline-btn clay-marshmallow-subtle px-3 py-1 rounded-xl text-3xs font-bold text-[#5C5549] hover:text-[#191917] hover:border-[#191917] transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+							<svg class="h-3 w-3 text-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+							</svg>
+							<span class="btn-label">Hide Sidebar</span>
+						</button>
 					</div>
 				</div>
 
@@ -142,8 +149,8 @@
 								<div>
 									<span class="text-4xs text-[#7A7365] uppercase font-bold tracking-wider block">Wholesale Unit Price</span>
 									<div class="flex items-baseline gap-2 mt-0.5">
-										<span class="text-2xl sm:text-3xl font-black text-[#191917] price-text">${{ number_format($product->price, 2) }}</span>
-										<span class="text-xs text-[#9C9283] line-through price-text">${{ number_format($product->msrp, 2) }} MSRP</span>
+										<span class="text-2xl sm:text-3xl font-black text-[#191917] price-text">₦{{ number_format($product->price, 2) }}</span>
+										<span class="text-xs text-[#9C9283] line-through price-text">₦{{ number_format($product->msrp, 2) }} MSRP</span>
 									</div>
 								</div>
 								@php

@@ -115,11 +115,9 @@
 	<header class="sticky top-0 z-50 border-b border-[#E0D3C1]/80 bg-[#FAF6EE]/95 backdrop-blur-md transition-all">
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 			<div class="flex h-14 sm:h-16 items-center justify-between gap-4">
-				<!-- Brand logo: Circular Sunny Yellow Badge -->
-				<a class="flex items-center gap-2.5 group tracking-tight text-[#191917] shrink-0" href="{{ Auth::check() ? url('/home') : url('/') }}">
-					<span class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-[#FFD000] text-[#191917] shadow-xs transition-transform group-hover:scale-105 font-black text-2xs sm:text-xs uppercase tracking-tight">
-						EB
-					</span>
+				<!-- Brand logo: Custom Transparent EB Emblem -->
+				<a class="flex items-center gap-2.5 group tracking-tight text-[#191917] shrink-0" href="{{ Auth::check() ? (Auth::user()->isAdmin() ? url('/admin') : (Auth::user()->isSupplier() ? url('/supplier/dashboard') : url('/catalog'))) : url('/') }}">
+					<img src="{{ asset('images/easybuy-logo.png') }}" alt="EasyBuy Logo" class="h-9 w-9 sm:h-10 sm:w-10 object-contain drop-shadow-xs transition-transform group-hover:scale-105">
 					<span class="font-heading tracking-tight text-lg sm:text-xl font-black text-[#191917]">EASYBUY</span>
 				</a>
 
@@ -142,7 +140,7 @@
 						<span>Admin Console</span>
 					</span>
 					<a href="{{ url('/catalog') }}" class="text-3xs font-bold uppercase tracking-wider text-[#7A7365] hover:text-[#191917] clay-marshmallow-subtle hover:bg-[#FAF6EE] px-3.5 py-1.5 rounded-full transition flex items-center gap-1">
-						<span>View Catalog</span>
+						<span>Shop Catalog</span>
 						<span>&rarr;</span>
 					</a>
 				</div>
@@ -152,7 +150,7 @@
 						<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
 						<span>Supplier Hub</span>
 					</span>
-					<a href="{{ url('/home') }}" class="text-3xs font-bold uppercase tracking-wider text-[#7A7365] hover:text-[#191917] clay-marshmallow-subtle hover:bg-[#FAF6EE] px-3.5 py-1.5 rounded-full transition flex items-center gap-1">
+					<a href="{{ url('/catalog') }}" class="text-3xs font-bold uppercase tracking-wider text-[#7A7365] hover:text-[#191917] clay-marshmallow-subtle hover:bg-[#FAF6EE] px-3.5 py-1.5 rounded-full transition flex items-center gap-1">
 						<span>Switch to Buyer</span>
 						<span>&rarr;</span>
 					</a>
@@ -233,10 +231,8 @@
 		
 		<!-- Top Drawer Header -->
 		<div class="p-5 border-b border-[#E0D3C1] flex items-center justify-between">
-			<a class="flex items-center gap-2 group tracking-tight text-[#191917]" href="{{ Auth::check() ? url('/home') : url('/') }}" onclick="toggleMobileMenu(false)">
-				<span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFD000] text-[#191917] font-black text-2xs uppercase">
-					EB
-				</span>
+			<a class="flex items-center gap-2 group tracking-tight text-[#191917]" href="{{ Auth::check() ? (Auth::user()->isAdmin() ? url('/admin') : (Auth::user()->isSupplier() ? url('/supplier/dashboard') : url('/catalog'))) : url('/') }}" onclick="toggleMobileMenu(false)">
+				<img src="{{ asset('images/easybuy-logo.png') }}" alt="EasyBuy" class="h-8 w-8 object-contain">
 				<span class="font-heading tracking-tight text-lg font-black text-[#191917]">EASYBUY</span>
 			</a>
 			<button onclick="toggleMobileMenu(false)" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F2EAE0] hover:bg-[#E8DECF] text-[#191917] transition cursor-pointer" aria-label="Close menu">
@@ -271,17 +267,10 @@
 					</div>
 				</div>
 
-				<!-- Navigation Section -->
+				<!-- Navigation Section (Order: 1. Catalog, 2. Cart, 3. Ask Easy) -->
 				<div class="space-y-1">
 					<p class="text-4xs font-black uppercase tracking-wider text-[#9C9283] px-3 pb-1">Workspace</p>
 					
-					<a href="{{ url('/home') }}" onclick="toggleMobileMenu(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#191917] hover:bg-[#F2EAE0] transition">
-						<svg class="h-4 w-4 text-[#FFD000]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-						</svg>
-						<span>Ask Easy AI Sourcing</span>
-					</a>
-
 					<a href="{{ url('/catalog') }}" onclick="toggleMobileMenu(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#191917] hover:bg-[#F2EAE0] transition">
 						<svg class="h-4 w-4 text-[#7A7365]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -297,6 +286,13 @@
 							<span>My Cart</span>
 						</div>
 						<span class="h-5 w-5 rounded-full bg-[#191917] text-[#FFD000] text-3xs font-black flex items-center justify-center" id="mobile-drawer-cart-count">0</span>
+					</a>
+
+					<a href="{{ url('/home') }}" onclick="toggleMobileMenu(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#191917] hover:bg-[#F2EAE0] transition">
+						<svg class="h-4 w-4 text-[#FFD000]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+						</svg>
+						<span>Ask Easy AI Sourcing</span>
 					</a>
 
 					@if(Auth::user()->isAdmin())
@@ -406,6 +402,7 @@
 					</button>
 				</form>
 			@endauth
+
 
 			<div class="flex items-center justify-between text-4xs font-bold text-[#7A7365]">
 				<span>✓ Net-30 / Net-60 Verified</span>
@@ -543,10 +540,12 @@
 				const navBadge = document.getElementById('nav-cart-count');
 				const sidebarBadge = document.getElementById('sidebar-cart-count');
 				const drawerBadge = document.getElementById('mobile-drawer-cart-count');
+				const mobileBarBadge = document.getElementById('mobile-bar-cart-count');
 
 				if (navBadge) navBadge.innerText = totalCount;
 				if (sidebarBadge) sidebarBadge.innerText = totalCount;
 				if (drawerBadge) drawerBadge.innerText = totalCount;
+				if (mobileBarBadge) mobileBarBadge.innerText = totalCount;
 
 				// If on dedicated Cart page, trigger re-render
 				if (typeof window.renderCartPage === 'function') {
@@ -602,7 +601,7 @@
 					title: orderData.title || 'Monthly Workspace Restock',
 					frequency: orderData.frequency || 'Monthly (Every 30 Days)',
 					nextDelivery: formattedNextDate,
-					total: orderData.total || '$0.00',
+					total: orderData.total || '₦0.00',
 					savings: orderData.savings || 'Wholesale Applied',
 					items: orderData.items || [],
 					status: 'Active',

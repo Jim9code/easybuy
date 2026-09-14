@@ -7,7 +7,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\PasswordResetCode;
+use App\Mail\PasswordResetCodeMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -40,8 +42,8 @@ class AuthController extends Controller
             return redirect('/home?username=' . urlencode($user->username) . '&prompt=' . urlencode($pendingPrompt));
         }
 
-        // Redirect to the dashboard home with their username in the query parameters (matching our current dashboard request('username') logic)
-        return redirect('/home?username=' . $user->username);
+        // Redirect to the wholesale catalog
+        return redirect()->route('catalog');
     }
 
 
@@ -57,10 +59,30 @@ class AuthController extends Controller
 
         //attempts to authenticate the user and check if credentials are correct
         if (Auth::attempt($credentials, $request->boolean('remember_me'))) {
+            $user = Auth::user();
+
+            // Check if account is suspended or banned
+            if ($user->isBanned()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withErrors([
+                    'email' => 'This account has been banned from EasyBuy for compliance violations.' . ($user->status_reason ? " Reason: {$user->status_reason}" : '')
+                ])->onlyInput('email');
+            }
+
+            if ($user->isSuspended()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withErrors([
+                    'email' => 'This account has been temporarily suspended by EasyBuy Administration.' . ($user->status_reason ? " Reason: {$user->status_reason}" : '')
+                ])->onlyInput('email');
+            }
+
             if ($request->hasSession()) {
                 $request->session()->regenerate();
             }
-            $user = Auth::user();
 
             if ($user->isAdmin()) {
                 return redirect()->route('admin.dashboard');
@@ -75,7 +97,7 @@ class AuthController extends Controller
                 return redirect('/home?username=' . urlencode($user->username) . '&prompt=' . urlencode($pendingPrompt));
             }
 
-            return redirect('/home?username=' . $user->username);
+            return redirect()->route('catalog');
         }
 
         //if credentials are not correct 
@@ -115,15 +137,18 @@ public function sendResetCode(Request $request)
         ]
     );
     
-    // Send email using Mailtrap SMTP credentials configured in .env
-    Mail::raw("Your EasyBuy password reset code is: {$code}", function ($message) use ($request) {
-        $message->to($request->email)
-                ->subject('Password Reset Code');
-    });
+    // Send branded HTML email using Mailtrap / SMTP credentials
+    try {
+        $user = User::where('email', $request->email)->first();
+        Mail::to($request->email)->send(new PasswordResetCodeMail((string) $code, $request->email, $user));
+        Log::info("Password reset code successfully dispatched to {$request->email}");
+    } catch (\Throwable $e) {
+        Log::error("Failed to send password reset email to {$request->email}: " . $e->getMessage());
+    }
 
     // Redirect back to the form, prefilling the email, and flashing a success banner
-    return redirect('/forgot-password?email=' . $request->email)
-        ->with('success', 'A 5-digit verification code has been sent to your email.');
+    return redirect('/forgot-password?email=' . urlencode($request->email))
+        ->with('success', 'A 5-digit verification code has been dispatched to your email address.');
 }
 // 5. Reset Password using the code
 public function resetPassword(Request $request)

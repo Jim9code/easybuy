@@ -43,6 +43,7 @@ class AdminController extends Controller
         $metrics = [
             'total_volume' => $totalVolume,
             'total_orders' => Order::count(),
+            'total_order_items' => OrderItem::count(),
             'pending_applications' => SupplierProfile::whereIn('verification_status', ['under_review', 'in_audit'])->count(),
             'verified_suppliers' => SupplierProfile::where('verification_status', 'approved')->count(),
             'total_buyers' => User::where('role', 'buyer')->count(),
@@ -200,6 +201,113 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('success', "Role for {$targetUser->email} changed to {$request->role}.");
+    }
+
+    /**
+     * Update Account Status (active, suspended, banned)
+     */
+    public function updateUserStatus(Request $request, $id)
+    {
+        $this->guardAdmin();
+
+        $request->validate([
+            'account_status' => 'required|string|in:active,suspended,banned',
+            'status_reason' => 'nullable|string|max:255',
+        ]);
+
+        $targetUser = User::findOrFail($id);
+
+        // Prevent admin from banning or suspending their own active session
+        if ($targetUser->id === Auth::id()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Action denied: You cannot suspend or ban your own administrator account.'
+                ], 422);
+            }
+            return redirect()->back()->with('error', 'Action denied: You cannot suspend or ban your own account.');
+        }
+
+        $bannedAt = $request->account_status === 'banned' ? now() : null;
+
+        $targetUser->update([
+            'account_status' => $request->account_status,
+            'status_reason' => $request->status_reason ?: null,
+            'banned_at' => $bannedAt,
+        ]);
+
+        $statusLabel = match($request->account_status) {
+            'banned' => 'Banned',
+            'suspended' => 'Suspended',
+            default => 'Reactivated & Active'
+        };
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => "User {$targetUser->email} status updated to: {$statusLabel}."
+            ]);
+        }
+
+        return redirect()->back()->with('success', "User {$targetUser->email} is now {$statusLabel}.");
+    }
+
+    /**
+     * Admin Direct Password Reset for User
+     */
+    public function resetUserPassword(Request $request, $id)
+    {
+        $this->guardAdmin();
+
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $targetUser = User::findOrFail($id);
+        $targetUser->update([
+            'password' => $request->password,
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => "Password for {$targetUser->email} has been reset successfully."
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Password for {$targetUser->email} reset successfully.");
+    }
+
+    /**
+     * Delete User Account
+     */
+    public function destroyUser(Request $request, $id)
+    {
+        $this->guardAdmin();
+
+        $targetUser = User::findOrFail($id);
+
+        if ($targetUser->id === Auth::id()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Action denied: You cannot delete your own account.'
+                ], 422);
+            }
+            return redirect()->back()->with('error', 'Action denied: You cannot delete your own account.');
+        }
+
+        $email = $targetUser->email;
+        $targetUser->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => "User account {$email} permanently removed."
+            ]);
+        }
+
+        return redirect()->back()->with('success', "User account {$email} deleted.");
     }
 
     /**

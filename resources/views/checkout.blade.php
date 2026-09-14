@@ -55,14 +55,29 @@
 
 							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div>
-									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Company / Entity Name</label>
-									<input type="text" name="company_name" value="{{ old('company_name', Auth::user()->company_name ?? 'Acme Corp Procurement') }}" required
-										class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. Acme Logistics Ltd.">
+									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Company / Organization Name</label>
+									<input type="text" name="company_name" value="{{ old('company_name', Auth::user()->company_name ?? 'EasyBuy Technologies Nigeria Ltd') }}" required
+										class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. Apex Industrial Sourcing Ltd.">
 								</div>
+
 								<div>
-									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Billing / PO Email</label>
-									<input type="email" name="email" value="{{ old('email', Auth::user()->email ?? '') }}" required
-										class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="billing@company.com">
+									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Procurement Officer / Contact Person</label>
+									<input type="text" name="contact_name" value="{{ old('contact_name', Auth::user()->name ?? Auth::user()->username ?? 'Chinedu Okafor') }}" required
+										class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. Chinedu Okafor">
+								</div>
+
+								<div>
+									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Billing / PO Email Address</label>
+									<input type="email" name="email" value="{{ old('email', Auth::user()->email ?? 'procurement@easybuy.ng') }}" required
+										class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="procurement@company.ng">
+								</div>
+
+								<div>
+									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Contact Phone Number</label>
+									<div class="relative">
+										<input type="tel" name="phone" value="{{ old('phone', '0803 123 4567') }}" required
+											class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. 0803 123 4567 or +234 803 123 4567">
+									</div>
 								</div>
 							</div>
 						</div>
@@ -72,39 +87,72 @@
 							<div class="flex items-center justify-between pb-3 border-b border-[#E0D3C1]/50">
 								<h2 class="text-base font-bold text-[#191917] flex items-center gap-2">
 									<span class="h-6 w-6 rounded-full bg-[#FFD000] text-[#191917] text-3xs font-black flex items-center justify-center">2</span>
-									<span>Single Delivery Destination (Blind Drop Facility)</span>
+									<span>Delivery Destination (Consolidated Single Drop)</span>
 								</h2>
-								<span class="text-4xs font-bold uppercase tracking-wider text-emerald-800">Unified Drop</span>
+								<span class="text-4xs font-bold uppercase tracking-wider text-emerald-800">Unified Freight Drop</span>
 							</div>
 
 							<div class="space-y-4">
-								<div>
-									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Street Address / Receiving Dock Bay</label>
-									<input type="text" name="shipping_address" value="{{ old('shipping_address', 'Dock 4B, 100 Innovation Parkway') }}" required
-										class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="Street address or loading dock">
+								<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+									<!-- Country Dropdown -->
+									<div>
+										<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Country</label>
+										<select name="country" required class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000] cursor-pointer">
+											<option value="Nigeria" {{ old('country', 'Nigeria') === 'Nigeria' ? 'selected' : '' }}>🇳🇬 Nigeria (Default)</option>
+											<option value="Ghana" {{ old('country') === 'Ghana' ? 'selected' : '' }}>🇬🇭 Ghana</option>
+											<option value="Kenya" {{ old('country') === 'Kenya' ? 'selected' : '' }}>🇰🇪 Kenya</option>
+											<option value="South Africa" {{ old('country') === 'South Africa' ? 'selected' : '' }}>🇿🇦 South Africa</option>
+											<option value="United Kingdom" {{ old('country') === 'United Kingdom' ? 'selected' : '' }}>🇬🇧 United Kingdom</option>
+											<option value="United States" {{ old('country') === 'United States' ? 'selected' : '' }}>🇺🇸 United States</option>
+											<option value="Other" {{ old('country') === 'Other' ? 'selected' : '' }}>🌍 Other International</option>
+										</select>
+									</div>
+
+									<!-- Nigerian State Dropdown -->
+									<div>
+										<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">State / Federal Territory</label>
+										<select name="state" required class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000] cursor-pointer">
+											@php
+												$nigerianStates = [
+													'Lagos', 'FCT - Abuja', 'Rivers', 'Ogun', 'Oyo', 'Kano', 'Kaduna',
+													'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa',
+													'Benue', 'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo',
+													'Ekiti', 'Enugu', 'Gombe', 'Imo', 'Jigawa', 'Katsina',
+													'Kebbi', 'Kogi', 'Kwara', 'Nasarawa', 'Niger', 'Ondo',
+													'Osun', 'Plateau', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'
+												];
+												$selectedState = old('state', 'Lagos');
+											@endphp
+											@foreach($nigerianStates as $st)
+												<option value="{{ $st }}" {{ $selectedState === $st ? 'selected' : '' }}>{{ $st }}</option>
+											@endforeach
+										</select>
+									</div>
 								</div>
 
-								<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+								<!-- Street Address -->
+								<div>
+									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Street Address / Facility Dock Bay</label>
+									<input type="text" name="shipping_address" value="{{ old('shipping_address', 'Plot 14, Commercial Avenue, Industrial Estate') }}" required
+										class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. Plot 14, Commercial Avenue, Industrial Estate, Ikeja">
+								</div>
+
+								<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 									<div>
-										<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">City</label>
-										<input type="text" name="city" value="{{ old('city', 'Austin') }}" required
-											class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="City">
+										<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">City / LGA / District</label>
+										<input type="text" name="city" value="{{ old('city', 'Ikeja') }}" required
+											class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. Ikeja, Victoria Island, Lekki, Abuja, Port Harcourt">
 									</div>
 									<div>
-										<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">State / Province</label>
-										<input type="text" name="state" value="{{ old('state', 'Texas') }}" required
-											class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="State">
-									</div>
-									<div>
-										<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Zip / Postal Code</label>
-										<input type="text" name="zip" value="{{ old('zip', '78701') }}"
-											class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="78701">
+										<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Postal / Area Code (Optional)</label>
+										<input type="text" name="zip" value="{{ old('zip', '100001') }}"
+											class="w-full clay-input rounded-xl px-3.5 py-2.5 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. 100001">
 									</div>
 								</div>
 
 								<div>
-									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Delivery Instructions (Optional)</label>
-									<textarea name="notes" rows="2" class="w-full clay-input rounded-xl px-3.5 py-2 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. Liftgate required on consolidated drop"></textarea>
+									<label class="block text-3xs font-bold uppercase tracking-wider text-[#5C5549] mb-1.5">Delivery Instructions / Loading Bay Notes (Optional)</label>
+									<textarea name="notes" rows="2" class="w-full clay-input rounded-xl px-3.5 py-2 text-xs text-[#191917] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD000]" placeholder="e.g. Delivery gate clearance required; call warehouse receiving supervisor upon arrival."></textarea>
 								</div>
 							</div>
 						</div>
@@ -200,10 +248,10 @@
 												class="h-10 w-10 rounded-xl object-cover clay-marshmallow-subtle shrink-0">
 											<div class="min-w-0 flex-1">
 												<span class="font-bold text-[#191917] block truncate">{{ $item->product->name ?? 'Product' }}</span>
-												<span class="text-4xs text-[#7A7365]">Qty: {{ $item->quantity }} • ${{ number_format($item->unit_price, 2) }}</span>
+												<span class="text-4xs text-[#7A7365]">Qty: {{ $item->quantity }} • ₦{{ number_format($item->unit_price, 2) }}</span>
 											</div>
 										</div>
-										<span class="font-bold text-[#191917] price-text shrink-0">${{ number_format($item->unit_price * $item->quantity, 2) }}</span>
+										<span class="font-bold text-[#191917] price-text shrink-0">₦{{ number_format($item->unit_price * $item->quantity, 2) }}</span>
 									</div>
 								@endforeach
 							</div>
@@ -211,35 +259,47 @@
 							<!-- Financial Totals -->
 							<div class="space-y-2.5 text-xs pt-2">
 								<div class="flex justify-between text-[#5C5549]">
-									<span>Wholesale Subtotal</span>
-									<span class="font-bold text-[#191917] price-text">${{ number_format($subtotal, 2) }}</span>
+									<div>
+										<span class="block text-[#191917] font-medium">Items Wholesale Subtotal</span>
+										<span class="text-4xs text-[#7A7365]">Factory direct rate</span>
+									</div>
+									<span class="font-bold text-[#191917] price-text">₦{{ number_format($subtotal, 2) }}</span>
 								</div>
 
 								@if($savings > 0)
 									<div class="flex justify-between items-center text-emerald-800 clay-marshmallow-subtle p-2.5 rounded-xl">
-										<span class="font-bold text-3xs uppercase tracking-wider">Wholesale Direct Savings</span>
-										<span class="font-bold price-text">-${{ number_format($savings, 2) }}</span>
+										<div>
+											<span class="font-bold text-3xs uppercase tracking-wider block">Wholesale Margin Saved</span>
+											<span class="text-4xs text-[#5C5549] block">Saved vs. retail MSRP baseline</span>
+										</div>
+										<span class="font-bold price-text text-right">-₦{{ number_format($savings, 2) }} ({{ $savingsPercentage ?? 31 }}%)</span>
 									</div>
 								@endif
 
-								<div class="flex justify-between text-[#5C5549] text-3xs">
-									<span>Consolidated Unified Delivery</span>
-									<span class="font-bold text-emerald-800 uppercase">FREE</span>
+								<div class="flex justify-between text-[#5C5549] text-xs">
+									<div>
+										<span class="block text-[#191917] font-medium">Consolidated Shipping</span>
+										<span class="text-4xs text-[#7A7365]">Single destination freight dispatch (5% of order, min ₦1,000)</span>
+									</div>
+									<span class="font-bold text-[#191917] price-text">₦{{ number_format($shippingAmount, 2) }}</span>
 								</div>
 
-								<div class="flex justify-between text-[#5C5549] text-3xs">
-									<span>Estimated Tax & Duties</span>
-									<span class="font-bold text-[#191917] price-text">$0.00 (Exempt)</span>
+								<div class="flex justify-between text-[#5C5549] text-xs">
+									<div>
+										<span class="block text-[#191917] font-medium">Value Added Tax (VAT 7.5%)</span>
+										<span class="text-4xs text-[#7A7365]">Commercial statutory rate</span>
+									</div>
+									<span class="font-bold text-[#191917] price-text">₦{{ number_format($vatAmount, 2) }}</span>
 								</div>
 
 								<!-- Grand Total -->
 								<div class="pt-4 border-t border-[#E0D3C1]/50 flex justify-between items-baseline">
 									<div>
 										<span class="text-xs font-bold text-[#191917] block">Single Total Invoice</span>
-										<span class="text-4xs text-[#7A7365]">All direct suppliers bundled</span>
+										<span class="text-4xs text-[#7A7365]">Subtotal + Freight + 7.5% VAT</span>
 									</div>
 									<span class="text-2xl sm:text-3xl font-black text-[#191917] price-text">
-										${{ number_format($subtotal, 2) }}
+										₦{{ number_format($totalAmount, 2) }}
 									</span>
 								</div>
 							</div>

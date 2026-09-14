@@ -115,20 +115,54 @@ class ProductController extends Controller
             'lead_time' => 'nullable|string|max:255',
             'warranty' => 'nullable|string|max:255',
             'image_url' => 'nullable|string',
+            'images' => 'nullable',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'new_image_files.*' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
         ]);
 
         if (empty($incomingFields['msrp'])) {
             $incomingFields['msrp'] = round($incomingFields['price'] * 1.45, 2);
         }
 
-        // Handle uploaded local image file if present
+        // Parse retained gallery images list if provided
+        $galleryImages = [];
+        if ($request->has('images')) {
+            $rawImages = $request->input('images');
+            if (is_string($rawImages)) {
+                $decoded = json_decode($rawImages, true);
+                $galleryImages = is_array($decoded) ? $decoded : [];
+            } elseif (is_array($rawImages)) {
+                $galleryImages = $rawImages;
+            }
+        } else {
+            $galleryImages = $product->gallery_images;
+        }
+
+        // Handle uploaded local single image file if present
         if ($request->hasFile('image_file')) {
             $file = $request->file('image_file');
             $filename = 'product_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/products'), $filename);
-            $incomingFields['image_url'] = asset('uploads/products/' . $filename);
+            $newUrl = asset('uploads/products/' . $filename);
+            array_unshift($galleryImages, $newUrl);
         }
+
+        // Handle multiple new image files if present
+        if ($request->hasFile('new_image_files')) {
+            foreach ($request->file('new_image_files') as $file) {
+                if ($file && $file->isValid()) {
+                    $filename = 'product_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/products'), $filename);
+                    $galleryImages[] = asset('uploads/products/' . $filename);
+                }
+            }
+        }
+
+        // Deduplicate and clean up array
+        $galleryImages = array_values(array_unique(array_filter($galleryImages)));
+        
+        $incomingFields['images'] = $galleryImages;
+        $incomingFields['image_url'] = $galleryImages[0] ?? ($product->image_url ?: asset('images/3d-refs/ergo_chair.jpg'));
 
         $product->update($incomingFields);
 
@@ -136,7 +170,23 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Product updated successfully!',
-                'product' => $product
+                'product' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'sku' => $product->sku,
+                    'category' => $product->category,
+                    'description' => $product->description,
+                    'stock' => $product->stock,
+                    'price' => (float) $product->price,
+                    'unit_cost' => (float) $product->price,
+                    'tier_2' => (float) $product->price,
+                    'tier_1' => (float) $product->msrp,
+                    'msrp' => (float) $product->msrp,
+                    'lead_time' => $product->lead_time,
+                    'warranty' => $product->warranty,
+                    'image' => $product->primary_image,
+                    'images' => $product->gallery_images,
+                ]
             ]);
         }
 

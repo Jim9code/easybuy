@@ -74,7 +74,10 @@
 
 					<!-- Password Field -->
 					<div>
-						<label for="password" class="block text-xs font-bold uppercase tracking-wider text-[#191917]">Password</label>
+						<div class="flex items-center justify-between">
+							<label for="password" class="block text-xs font-bold uppercase tracking-wider text-[#191917]">Password</label>
+							<span id="password-strength-label" class="text-4xs font-bold uppercase tracking-wider text-[#7A7365]">Strength: None</span>
+						</div>
 						<div class="mt-1.5 relative rounded-xl shadow-sm">
 							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
 								<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -82,13 +85,55 @@
 								</svg>
 							</div>
 							<input type="password" name="password" id="password" required autocomplete="new-password" placeholder="••••••••"
-								class="block w-full pl-10 pr-4 py-3 rounded-xl border border-[#D8C9B5] bg-[#FAF6EE] text-sm text-[#191917] placeholder-[#9C9283] focus:outline-none focus:ring-2 focus:ring-[#FFD000] focus:border-[#FFD000] transition duration-200" />
+								oninput="validateRegistrationPassword()"
+								class="block w-full pl-10 pr-10 py-3 rounded-xl border border-[#D8C9B5] bg-[#FAF6EE] text-sm text-[#191917] placeholder-[#9C9283] focus:outline-none focus:ring-2 focus:ring-[#FFD000] focus:border-[#FFD000] transition duration-200" />
+							
+							<!-- Password Visibility Toggle Button -->
+							<button type="button" onclick="togglePasswordVisibility('password', 'toggle-pwd-icon')"
+								class="absolute inset-y-0 right-0 pr-3 flex items-center text-[#7A7365] hover:text-[#191917] transition cursor-pointer"
+								title="Toggle password visibility">
+								<svg id="toggle-pwd-icon" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+									<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+								</svg>
+							</button>
+						</div>
+
+						<!-- Password Strength Bar (4 Segment Progress) -->
+						<div class="mt-2 grid grid-cols-4 gap-1.5 h-1.5 rounded-full overflow-hidden bg-[#E8DECF]">
+							<div id="strength-bar-1" class="h-full rounded-full transition-all duration-300 bg-transparent"></div>
+							<div id="strength-bar-2" class="h-full rounded-full transition-all duration-300 bg-transparent"></div>
+							<div id="strength-bar-3" class="h-full rounded-full transition-all duration-300 bg-transparent"></div>
+							<div id="strength-bar-4" class="h-full rounded-full transition-all duration-300 bg-transparent"></div>
+						</div>
+
+						<!-- Live Validation Criteria Checklist Pills -->
+						<div class="mt-2.5 grid grid-cols-2 gap-1.5 text-4xs font-bold text-[#7A7365]">
+							<div id="rule-length" class="flex items-center gap-1.5 transition-colors">
+								<span class="rule-icon h-3.5 w-3.5 rounded-full bg-[#E8DECF] text-[#7A7365] flex items-center justify-center text-4xs">○</span>
+								<span>8+ characters</span>
+							</div>
+							<div id="rule-upper" class="flex items-center gap-1.5 transition-colors">
+								<span class="rule-icon h-3.5 w-3.5 rounded-full bg-[#E8DECF] text-[#7A7365] flex items-center justify-center text-4xs">○</span>
+								<span>1 uppercase (A-Z)</span>
+							</div>
+							<div id="rule-lower" class="flex items-center gap-1.5 transition-colors">
+								<span class="rule-icon h-3.5 w-3.5 rounded-full bg-[#E8DECF] text-[#7A7365] flex items-center justify-center text-4xs">○</span>
+								<span>1 lowercase (a-z)</span>
+							</div>
+							<div id="rule-number" class="flex items-center gap-1.5 transition-colors">
+								<span class="rule-icon h-3.5 w-3.5 rounded-full bg-[#E8DECF] text-[#7A7365] flex items-center justify-center text-4xs">○</span>
+								<span>1 number or symbol</span>
+							</div>
 						</div>
 					</div>
 
 					<!-- Confirm Password Field -->
 					<div>
-						<label for="password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-[#191917]">Confirm Password</label>
+						<div class="flex items-center justify-between">
+							<label for="password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-[#191917]">Confirm Password</label>
+							<span id="password-match-indicator" class="text-4xs font-bold uppercase tracking-wider hidden"></span>
+						</div>
 						<div class="mt-1.5 relative rounded-xl shadow-sm">
 							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
 								<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -96,25 +141,148 @@
 								</svg>
 							</div>
 							<input type="password" name="password_confirmation" id="password_confirmation" required autocomplete="new-password" placeholder="••••••••"
-								class="block w-full pl-10 pr-4 py-3 rounded-xl border border-[#D8C9B5] bg-[#FAF6EE] text-sm text-[#191917] placeholder-[#9C9283] focus:outline-none focus:ring-2 focus:ring-[#FFD000] focus:border-[#FFD000] transition duration-200" />
+								oninput="validatePasswordMatch()"
+								class="block w-full pl-10 pr-10 py-3 rounded-xl border border-[#D8C9B5] bg-[#FAF6EE] text-sm text-[#191917] placeholder-[#9C9283] focus:outline-none focus:ring-2 focus:ring-[#FFD000] focus:border-[#FFD000] transition duration-200" />
+							
+							<!-- Confirm Password Visibility Toggle -->
+							<button type="button" onclick="togglePasswordVisibility('password_confirmation', 'toggle-confirm-icon')"
+								class="absolute inset-y-0 right-0 pr-3 flex items-center text-[#7A7365] hover:text-[#191917] transition cursor-pointer"
+								title="Toggle password visibility">
+								<svg id="toggle-confirm-icon" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+									<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+								</svg>
+							</button>
 						</div>
 					</div>
 
 					<!-- Terms Checkbox -->
 					<div class="flex items-center">
 						<input id="terms" name="terms" type="checkbox" required
-							class="h-4 w-4 rounded border-[#D8C9B5] text-[#191917] focus:ring-[#FFD000] accent-[#191917]" />
-						<label for="terms" class="ml-2 block text-xs text-[#5C5549] font-medium">
+							class="h-4 w-4 rounded border-[#D8C9B5] text-[#191917] focus:ring-[#FFD000] accent-[#191917] cursor-pointer" />
+						<label for="terms" class="ml-2 block text-xs text-[#5C5549] font-medium cursor-pointer">
 							I agree to the <a href="#" class="font-bold text-[#191917] hover:underline">Terms of Service</a> and <a href="#" class="font-bold text-[#191917] hover:underline">Privacy Policy</a>
 						</label>
 					</div>
 
 					<!-- Submit Button -->
-					<button type="submit"
+					<button type="submit" id="register-submit-btn"
 						class="w-full bg-[#191917] hover:bg-[#333333] text-[#FAF6EE] flex justify-center py-3.5 px-4 rounded-xl text-sm font-bold transition duration-200 hover:scale-[1.01] active:scale-[0.99] shadow-sm cursor-pointer">
 						Create Account
 					</button>
 				</form>
+
+				<script>
+					function togglePasswordVisibility(inputId, iconId) {
+						const input = document.getElementById(inputId);
+						const icon = document.getElementById(iconId);
+						if (!input || !icon) return;
+
+						if (input.type === 'password') {
+							input.type = 'text';
+							icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />`;
+						} else {
+							input.type = 'password';
+							icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />`;
+						}
+					}
+
+					function validateRegistrationPassword() {
+						const pwd = document.getElementById('password').value || '';
+						
+						const hasLength = pwd.length >= 8;
+						const hasUpper = /[A-Z]/.test(pwd);
+						const hasLower = /[a-z]/.test(pwd);
+						const hasNumber = /[0-9\W_]/.test(pwd);
+
+						updateRuleElement('rule-length', hasLength);
+						updateRuleElement('rule-upper', hasUpper);
+						updateRuleElement('rule-lower', hasLower);
+						updateRuleElement('rule-number', hasNumber);
+
+						const score = (hasLength ? 1 : 0) + (hasUpper ? 1 : 0) + (hasLower ? 1 : 0) + (hasNumber ? 1 : 0);
+						const label = document.getElementById('password-strength-label');
+						const b1 = document.getElementById('strength-bar-1');
+						const b2 = document.getElementById('strength-bar-2');
+						const b3 = document.getElementById('strength-bar-3');
+						const b4 = document.getElementById('strength-bar-4');
+
+						// Reset bars
+						[b1, b2, b3, b4].forEach(b => b.className = 'h-full rounded-full transition-all duration-300 bg-transparent');
+
+						if (pwd.length === 0) {
+							label.innerText = 'Strength: None';
+							label.className = 'text-4xs font-bold uppercase tracking-wider text-[#7A7365]';
+						} else if (score <= 1) {
+							label.innerText = 'Strength: Weak';
+							label.className = 'text-4xs font-bold uppercase tracking-wider text-rose-600';
+							b1.className = 'h-full rounded-full transition-all duration-300 bg-rose-500';
+						} else if (score === 2) {
+							label.innerText = 'Strength: Fair';
+							label.className = 'text-4xs font-bold uppercase tracking-wider text-amber-600';
+							b1.className = 'h-full rounded-full transition-all duration-300 bg-amber-500';
+							b2.className = 'h-full rounded-full transition-all duration-300 bg-amber-500';
+						} else if (score === 3) {
+							label.innerText = 'Strength: Good';
+							label.className = 'text-4xs font-bold uppercase tracking-wider text-blue-600';
+							b1.className = 'h-full rounded-full transition-all duration-300 bg-blue-500';
+							b2.className = 'h-full rounded-full transition-all duration-300 bg-blue-500';
+							b3.className = 'h-full rounded-full transition-all duration-300 bg-blue-500';
+						} else if (score === 4) {
+							label.innerText = 'Strength: Strong';
+							label.className = 'text-4xs font-bold uppercase tracking-wider text-emerald-700';
+							[b1, b2, b3, b4].forEach(b => b.className = 'h-full rounded-full transition-all duration-300 bg-emerald-500');
+						}
+
+						validatePasswordMatch();
+					}
+
+					function updateRuleElement(elementId, passed) {
+						const el = document.getElementById(elementId);
+						if (!el) return;
+						const icon = el.querySelector('.rule-icon');
+						if (passed) {
+							el.className = 'flex items-center gap-1.5 transition-colors text-emerald-800 font-bold';
+							if (icon) {
+								icon.className = 'rule-icon h-3.5 w-3.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-4xs font-black';
+								icon.innerText = '✓';
+							}
+						} else {
+							el.className = 'flex items-center gap-1.5 transition-colors text-[#7A7365] font-normal';
+							if (icon) {
+								icon.className = 'rule-icon h-3.5 w-3.5 rounded-full bg-[#E8DECF] text-[#7A7365] flex items-center justify-center text-4xs';
+								icon.innerText = '○';
+							}
+						}
+					}
+
+					function validatePasswordMatch() {
+						const pwd = document.getElementById('password').value || '';
+						const confirmPwd = document.getElementById('password_confirmation').value || '';
+						const matchIndicator = document.getElementById('password-match-indicator');
+						const confirmInput = document.getElementById('password_confirmation');
+
+						if (!confirmPwd) {
+							matchIndicator.classList.add('hidden');
+							confirmInput.classList.remove('border-emerald-500', 'border-rose-400');
+							return;
+						}
+
+						matchIndicator.classList.remove('hidden');
+
+						if (pwd === confirmPwd) {
+							matchIndicator.innerText = '✓ Passwords match';
+							matchIndicator.className = 'text-4xs font-bold uppercase tracking-wider text-emerald-700';
+							confirmInput.classList.add('border-emerald-500');
+							confirmInput.classList.remove('border-rose-400');
+						} else {
+							matchIndicator.innerText = '✕ Does not match';
+							matchIndicator.className = 'text-4xs font-bold uppercase tracking-wider text-rose-600';
+							confirmInput.classList.add('border-rose-400');
+							confirmInput.classList.remove('border-emerald-500');
+						}
+					}
+				</script>
 
 				<div class="mt-6 border-t border-[#E0D3C1] pt-6 text-center">
 					<p class="text-xs text-[#5C5549]">

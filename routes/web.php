@@ -71,6 +71,7 @@ Route::post('/payment/initialize', [PaymentController::class, 'initialize'])->mi
 Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 Route::post('/payment/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
 Route::get('/order/invoice/{orderNumber}', [PaymentController::class, 'invoice'])->middleware('auth')->name('order.invoice');
+Route::post('/order/invoice/{orderNumber}/email', [PaymentController::class, 'resendEmail'])->middleware('auth')->name('order.invoice.email');
 
 // Supplier Portal & Workspace Routes
 Route::view('/supplier', 'supplier-onboard')->name('supplier.onboard');
@@ -92,6 +93,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/supplier-applications/{id}/reject', [AdminController::class, 'rejectApplication'])->name('applications.reject');
     Route::post('/supplier/{id}/tier', [AdminController::class, 'updateSupplierTier'])->name('supplier.tier');
     Route::post('/users/{id}/role', [AdminController::class, 'updateUserRole'])->name('users.role');
+    Route::post('/users/{id}/status', [AdminController::class, 'updateUserStatus'])->name('users.status');
+    Route::post('/users/{id}/reset-password', [AdminController::class, 'resetUserPassword'])->name('users.reset_password');
+    Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
     Route::delete('/products/{id}', [AdminController::class, 'destroyProduct'])->name('products.destroy');
 });
 
